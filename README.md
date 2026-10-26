@@ -6,15 +6,33 @@
 
 ```
 星阑文化/
+├── shared/            # 前后端【共用】引擎（纯 JS，浏览器与 Node 都可用）
+│   ├── charts.mjs     # 排盘：八字（lunar-javascript）+ 紫微（iztro）+ 黄历
+│   └── interpret.mjs  # 演示解读文案 + 流式分片（无后端时的本地回退）
 ├── server/            # Express 后端
 │   ├── index.mjs      # 路由：排盘 / AI 流式解读(SSE) / 模拟支付 / 每日运势
-│   ├── charts.mjs     # 排盘引擎（lunar-javascript 八字 + iztro 紫微，纯本地计算）
+│   ├── charts.mjs     # 转发 shared/charts.mjs（保持旧引用可用）
 │   └── ai.mjs         # DeepSeek 解读（JSON mode + 回退演示模板）
 ├── web/               # React + Vite 前端（紫色星空主题）
-│   └── src/pages/     # Home / Fortune(命盘解读) / Daily(每日运势) / About
+│   ├── src/lib/api.js        # 自动探测后端；不可用则回退本地引擎
+│   └── src/pages/            # Home / Fortune(命盘解读) / Daily(每日运势) / About
+├── .github/workflows/deploy.yml  # 推送到 main 自动构建并部署 GitHub Pages
 ├── .env.example       # 环境变量样例
 └── package.json
 ```
+
+## 在线演示（GitHub Pages）
+
+🔗 **https://zhdex.github.io/fortune-site/**
+
+推送到 `main` 即自动构建部署（`.github/workflows/deploy.yml`，构建时注入 `BASE_PATH=/fortune-site/`）。
+
+> **静态版的诚实说明**：Pages 只能托管静态文件，跑不了 Node 后端。此时
+> - **排盘照旧是真的**：八字、紫微、每日运势由浏览器内运行的同一套 `shared/` 引擎计算，结果与后端完全一致；
+> - **解读是内置示例文案**：真实 AI（DeepSeek）解读、HMAC 付费令牌校验、服务端模拟支付都需要后端，静态版会自动降级；
+> - 页面顶部会明确提示"静态演示版"，不糊弄访客。
+>
+> 想要真实 AI 解读，把前端 `web/dist` 与后端一起部署到任意支持 Node 的主机即可（前端探测到 `/api/health` 就自动切回真实模式）。
 
 ## 快速开始
 
