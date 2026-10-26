@@ -1,0 +1,17 @@
+{
+  "name": "xinglan-culture-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "星阑文化 · 玄学解读平台 后端服务（排盘 + AI 解读 + 模拟支付）",
+  "main": "server/index.mjs",
+  "scripts": {
+    "start": "node server/index.mjs",
+    "dev": "node --watch server/index.mjs"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "iztro": "^2.4.6",
+    "lunar-javascript": "^1.7.3"
+  }
+}
