@@ -1,0 +1,8 @@
+# pnpm 11 起，此类设置写在 pnpm-workspace.yaml（package.json 的 pnpm 字段已不再读取）
+# 1) 放行 esbuild（vite 依赖）的安装脚本，否则其构建脚本会被拦下
+# 2) strictDepBuilds=false：即使将来有未放行的依赖，install 也不以非零退出（CI 友好）
+allowBuilds:
+  esbuild: true
+onlyBuiltDependencies:
+  - esbuild
+strictDepBuilds: false
