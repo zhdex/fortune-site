@@ -19,6 +19,7 @@
 │   ├── src/components/       # Nav / LangSwitcher / Mandala(SVG 符印) / Icons / StarField / PayModal
 │   ├── src/lib/api.js        # 自动探测后端；不可用则回退本地引擎
 │   └── src/pages/            # Home / Fortune(命盘解读) / Daily(每日运势) / About
+├── assets/            # 素材归档（项目自包含）：source 原始素材 / generated ComfyUI 原图 / screenshots 验收截图
 ├── .github/workflows/deploy.yml  # 推送到 main 自动构建并部署 GitHub Pages
 ├── .env.example       # 环境变量样例
 └── package.json
@@ -30,6 +31,8 @@
 - **多语言**：右上角地球按钮切换 **简体中文 / 繁體中文 / English**，选择记入 `localStorage`（`xinglan_lang`），并同步 `<html lang>`；词库集中在 `web/src/i18n/dict.js`，新增语言只需加一个对象 + 在 `LANGS` 登记。
 - **可扩展**：首页由 `content` 驱动（服务卡 / 三步流程 / 定价 / FAQ 均为数据段），页面为 hash 路由，新增页面在 `App.jsx` 的 `ROUTES` 里加一项即可。
 - **无障碍**：尊重系统 `prefers-reduced-motion`，关闭动画并取消错峰延迟。
+- **素材出处**：每张图的原始文件、生成提示词、优化参数都记在 [`assets/README.md`](assets/README.md)，
+  换台机器也能照着重做；站点实际引用的图在 `web/public/images/`。
 
 ## 在线演示（GitHub Pages）
 
