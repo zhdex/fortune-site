@@ -13,13 +13,23 @@
 │   ├── index.mjs      # 路由：排盘 / AI 流式解读(SSE) / 模拟支付 / 每日运势
 │   ├── charts.mjs     # 转发 shared/charts.mjs（保持旧引用可用）
 │   └── ai.mjs         # DeepSeek 解读（JSON mode + 回退演示模板）
-├── web/               # React + Vite 前端（紫色星空主题）
+├── web/               # React + Vite 前端（星河幻境主题：深空紫 + 金色符印）
+│   ├── public/images/        # 主视觉背景（hero-bg.webp/jpg）与 ComfyUI 生成的图标/符印
+│   ├── src/i18n/             # 三语词库与切换机制（简中 / 繁中 / English）
+│   ├── src/components/       # Nav / LangSwitcher / Mandala(SVG 符印) / Icons / StarField / PayModal
 │   ├── src/lib/api.js        # 自动探测后端；不可用则回退本地引擎
 │   └── src/pages/            # Home / Fortune(命盘解读) / Daily(每日运势) / About
 ├── .github/workflows/deploy.yml  # 推送到 main 自动构建并部署 GitHub Pages
 ├── .env.example       # 环境变量样例
 └── package.json
 ```
+
+## 界面与多语言
+
+- **视觉**：整幅星河背景 + 金色细线符印（纯 SVG，可旋转/呼吸，缩放不糊）+ 四张功能卡（图标为本地 ComfyUI qwen_image_2.1 生成的透明 PNG，转 WebP 后每枚约 10 KB）。
+- **多语言**：右上角地球按钮切换 **简体中文 / 繁體中文 / English**，选择记入 `localStorage`（`xinglan_lang`），并同步 `<html lang>`；词库集中在 `web/src/i18n/dict.js`，新增语言只需加一个对象 + 在 `LANGS` 登记。
+- **可扩展**：首页由 `content` 驱动（服务卡 / 三步流程 / 定价 / FAQ 均为数据段），页面为 hash 路由，新增页面在 `App.jsx` 的 `ROUTES` 里加一项即可。
+- **无障碍**：尊重系统 `prefers-reduced-motion`，关闭动画并取消错峰延迟。
 
 ## 在线演示（GitHub Pages）
 

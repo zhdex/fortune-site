@@ -1,52 +1,268 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import Mandala from '../components/Mandala.jsx';
+import { CARD_ICONS } from '../components/Icons.jsx';
+import { useI18n } from '../i18n/index.js';
+import { api } from '../lib/api.js';
 
-const FEATURES = [
-  { icon: '🌙', title: '八字命盘', desc: '四柱排盘 · 五行格局 · 大运流年，一句话讲清你的天生底色' },
-  { icon: '✨', title: '紫微斗数', desc: '十二宫安星 · 命宫主星 · 夫妻官禄，看懂你人生剧本的起承转合' },
-  { icon: '🌅', title: '每日运势', desc: '黄历宜忌 + 通俗开运提示，每天清晨一条，温柔开启新一天' },
-];
+const CardKeys = ['self', 'career', 'love', 'fortune'];
+
+function todayStr() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+function Hero() {
+  const { t } = useI18n();
+  const go = (h) => () => { window.location.hash = h; };
+  return (
+    <section className="hero full-bleed">
+      <div className="hero-bg" aria-hidden="true">
+        <div
+          className="hero-bg-img"
+          style={{
+            backgroundImage: `url(${import.meta.env.BASE_URL}images/hero-bg.webp), url(${import.meta.env.BASE_URL}images/hero-bg.jpg)`,
+          }}
+        />
+        <div className="hero-veil" />
+      </div>
+
+      <div className="hero-inner container-wide">
+        <div className="hero-copy">
+          <div className="eyebrow">
+            <span className="eyebrow-line" />
+            <span>{t('hero.eyebrow')}</span>
+          </div>
+
+          <h1 className="hero-title">{t('hero.title')}</h1>
+          <p className="hero-sub">{t('hero.sub')}</p>
+
+          <div className="hero-actions">
+            <button className="btn btn-gold btn-lg" onClick={go('#/fortune')}>
+              {t('hero.cta')}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6">
+                <path d="M2 8h11M9 4l4 4-4 4" />
+              </svg>
+            </button>
+            <button className="btn btn-ghost btn-lg" onClick={go('#/daily')}>{t('hero.secondary')}</button>
+          </div>
+
+          <ul className="hero-badges">
+            {['hero.badge1', 'hero.badge2', 'hero.badge3'].map((k) => (
+              <li key={k}><span className="tick">✦</span>{t(k)}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="hero-vertical" aria-hidden="true">{t('hero.vertical')}</div>
+      </div>
+    </section>
+  );
+}
+
+function CardMedallion({ k }) {
+  const [broken, setBroken] = useState(false);
+  const Icon = CARD_ICONS[k];
+  return (
+    <span className="medallion-icon">
+      {broken
+        ? <Icon />
+        : (
+          <img
+            src={`${import.meta.env.BASE_URL}images/gen/icon-${k}.webp`}
+            alt=""
+            loading="lazy"
+            onError={() => setBroken(true)}
+          />
+        )}
+    </span>
+  );
+}
+
+function ServiceCards() {
+  const { t } = useI18n();
+  return (
+    <section className="services container-wide">
+      <div className="cards-grid">
+        {CardKeys.map((k, i) => (
+          <button
+            key={k}
+            className="service-card"
+            style={{ animationDelay: `${i * 90}ms` }}
+            onClick={() => { window.location.hash = k === 'fortune' ? '#/daily' : '#/fortune'; }}
+          >
+            <span className="card-ornament tl" />
+            <span className="card-ornament tr" />
+            <span className="card-ornament bl" />
+            <span className="card-ornament br" />
+
+            <span className="card-medallion">
+              <span className="medallion-ring" />
+              <CardMedallion k={k} />
+            </span>
+
+            <h3 className="card-title">{t(`cards.${k}.title`)}</h3>
+            <p className="card-desc">{t(`cards.${k}.desc`)}</p>
+            <span className="card-tag">{t(`cards.${k}.tag`)}</span>
+
+            <span className="card-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M2 8h11M9 4l4 4-4 4" />
+              </svg>
+            </span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function HowItWorks() {
+  const { t } = useI18n();
+  return (
+    <section className="how container">
+      <header className="section-head">
+        <span className="kicker">PROCESS</span>
+        <h2 className="section-h2">{t('how.title')}</h2>
+        <p className="section-sub">{t('how.sub')}</p>
+      </header>
+      <ol className="steps">
+        {['s1', 's2', 's3'].map((s, i) => (
+          <li key={s} className="step">
+            <span className="step-num">{String(i + 1).padStart(2, '0')}</span>
+            <h4>{t(`how.${s}.t`)}</h4>
+            <p>{t(`how.${s}.d`)}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+function DailyStrip() {
+  const { t } = useI18n();
+  const [data, setData] = useState(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    api.daily(todayStr())
+      .then((r) => { if (alive) setData(r); })
+      .catch(() => { if (alive) setFailed(true); });
+    return () => { alive = false; };
+  }, []);
+
+  return (
+    <section className="daily-strip container">
+      <div className="daily-inner">
+        <div className="daily-left">
+          <span className="kicker">TODAY</span>
+          <h2 className="section-h2">{t('daily.title')}</h2>
+          <p className="section-sub">{t('daily.sub')}</p>
+          {data?.daily && (
+            <div className="daily-meta">
+              <span className="chip gold">{data.daily.dayGanzhi}</span>
+              <span className="chip">{data.daily.lunar}</span>
+            </div>
+          )}
+        </div>
+
+        <div className="daily-right">
+          {!data && !failed && <div className="daily-skeleton"><span /><span /><span /></div>}
+          {failed && <p className="daily-fallback">{t('daily.more')}</p>}
+          {data?.daily && (
+            <div className="yiji">
+              <div className="yiji-box yiji-yi">
+                <div className="yiji-tag">{t('daily.yi')}</div>
+                <div className="yiji-words">
+                  {data.daily.yi.slice(0, 4).map((w) => <span key={w} className="word">{w}</span>)}
+                </div>
+              </div>
+              <div className="yiji-box yiji-ji">
+                <div className="yiji-tag">{t('daily.ji')}</div>
+                <div className="yiji-words">
+                  {data.daily.ji.slice(0, 4).map((w) => <span key={w} className="word">{w}</span>)}
+                </div>
+              </div>
+            </div>
+          )}
+          <button className="btn btn-ghost btn-sm daily-cta" onClick={() => { window.location.hash = '#/daily'; }}>
+            {t('daily.more')}
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Pricing() {
+  const { t } = useI18n();
+  return (
+    <section className="pricing container">
+      <div className="pricing-card glass-strong">
+        <div className="pricing-art" aria-hidden="true"><Mandala size={360} /></div>
+        <div className="pricing-copy">
+          <span className="kicker">REPORT</span>
+          <h2 className="section-h2">{t('pricing.title')}</h2>
+          <p className="section-sub">{t('pricing.sub')}</p>
+          <ul className="feature-list">
+            {['f1', 'f2', 'f3', 'f4', 'f5', 'f6'].map((f) => (
+              <li key={f}>
+                <span className="check">✓</span>
+                {t(`pricing.${f}`)}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="pricing-buy">
+          <div className="price-tag">
+            <span className="currency">¥</span>
+            <span className="amount">{t('pricing.price')}</span>
+          </div>
+          <div className="price-unit">{t('pricing.unit')}</div>
+          <button className="btn btn-gold btn-lg btn-block" onClick={() => { window.location.hash = '#/fortune'; }}>
+            {t('pricing.cta')}
+          </button>
+          <p className="price-note">{t('pricing.note')}</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Faq() {
+  const { t } = useI18n();
+  return (
+    <section className="faq container">
+      <header className="section-head">
+        <span className="kicker">FAQ</span>
+        <h2 className="section-h2">{t('faq.title')}</h2>
+      </header>
+      <div className="faq-list">
+        {[1, 2, 3, 4].map((i) => (
+          <details key={i} className="faq-item">
+            <summary>
+              <span>{t(`faq.q${i}`)}</span>
+              <span className="faq-plus" aria-hidden="true">+</span>
+            </summary>
+            <p>{t(`faq.a${i}`)}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   return (
-    <div>
-      <section className="hero">
-        <h1 className="hero-title">仰望星阑之处<br />遇见更懂自己的你</h1>
-        <p className="hero-sub">
-          八字 · 紫微斗数 · 每日运势 —— 深奥的古老智慧，被翻译成温柔的白话
-        </p>
-        <div className="hero-actions hero-actions-row" style={{ display: 'flex', justifyContent: 'center' }}>
-          <div className="hero-cta">
-            <button className="btn btn-primary" onClick={() => (window.location.hash = '#/fortune')}>
-              ✦ 开始排盘
-            </button>
-            <button className="btn btn-ghost" onClick={() => (window.location.hash = '#/daily')}>
-              今日运势
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <div className="divider" />
-
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18 }}>
-        {FEATURES.map((f) => (
-          <div key={f.title} className="glass section-block" style={{ marginTop: 0, textAlign: 'center', transition: 'transform 450ms cubic-bezier(0.4,0,0.2,1)' }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>{f.icon}</div>
-            <h3 style={{ letterSpacing: 3, marginBottom: 10, color: 'var(--text-hi)' }}>{f.title}</h3>
-            <p className="prose" style={{ fontSize: 14, color: 'var(--text-low)', lineHeight: 1.9 }}>{f.desc}</p>
-          </div>
-        ))}
-      </section>
-
-      <div className="glass section-block" style={{ textAlign: 'center' }}>
-        <h3 className="section-title" style={{ justifyContent: 'center' }}>我们如何解读你的命盘</h3>
-        <p className="prose" style={{ fontSize: 14.5 }}>
-          排盘由传统历法引擎精准计算（节气、时辰、安星全部本地完成），
-          再由 AI 把专业术语翻译成<strong style={{ color: 'var(--text-mid)' }}>人人能懂的温暖白话</strong>。
-          免费呈现总评与爱情、事业精华；完整报告（性格底色 / 婚姻详批 / 财运 / 健康 / 流年 / 开运）
-          一次解锁，长期可看。
-        </p>
-      </div>
+    <div className="home">
+      <Hero />
+      <ServiceCards />
+      <HowItWorks />
+      <DailyStrip />
+      <Pricing />
+      <Faq />
     </div>
   );
 }

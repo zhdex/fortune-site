@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { streamInterpret, getTokens, ensureMode, onModeChange } from '../lib/api.js';
 import PayModal from '../components/PayModal.jsx';
+import { useI18n } from '../i18n/index.js';
 
 const YEARS = Array.from({ length: 101 }, (_, i) => 2026 - i);
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -13,50 +14,52 @@ const HOURS = [
 
 /* ------------------------- 生辰表单 ------------------------- */
 function BirthForm({ onSubmit, loading }) {
+  const { t } = useI18n();
   const [form, setForm] = useState({ year: 1995, month: 8, day: 15, hour: -1, gender: '女', mode: 'bazi' });
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: k === 'hour' ? Number(e.target.value) : e.target.value }));
 
   return (
-    <div className="glass section-block" style={{ marginTop: 0 }}>
-      <h3 className="section-title">写下你的出生时刻</h3>
+    <div className="glass section-block form-card" style={{ marginTop: 0 }}>
       <div className="form-grid">
         <div className="field">
-          <label>出生年份</label>
-          <select value={form.year} onChange={set('year')}>{YEARS.map((y) => <option key={y} value={y}>{y} 年</option>)}</select>
+          <label>{t('fortune.year')}</label>
+          <select value={form.year} onChange={set('year')}>{YEARS.map((y) => <option key={y} value={y}>{y}</option>)}</select>
         </div>
         <div className="field">
-          <label>月份</label>
-          <select value={form.month} onChange={set('month')}>{MONTHS.map((m) => <option key={m} value={m}>{m} 月</option>)}</select>
+          <label>{t('fortune.month')}</label>
+          <select value={form.month} onChange={set('month')}>{MONTHS.map((m) => <option key={m} value={m}>{m}</option>)}</select>
         </div>
         <div className="field">
-          <label>日期</label>
-          <select value={form.day} onChange={set('day')}>{DAYS.map((d) => <option key={d} value={d}>{d} 日</option>)}</select>
+          <label>{t('fortune.day')}</label>
+          <select value={form.day} onChange={set('day')}>{DAYS.map((d) => <option key={d} value={d}>{d}</option>)}</select>
         </div>
         <div className="field">
-          <label>时辰</label>
-          <select value={form.hour} onChange={set('hour')}>{HOURS.map(([label, v]) => <option key={v} value={v}>{label}</option>)}</select>
-        </div>
-        <div className="field">
-          <label>性别</label>
-          <select value={form.gender} onChange={set('gender')}>
-            <option value="女">女</option>
-            <option value="男">男</option>
+          <label>{t('fortune.hour')}</label>
+          <select value={form.hour} onChange={set('hour')}>
+            {HOURS.map(([label, v]) => <option key={v} value={v}>{v < 0 ? t('fortune.hourUnknown') : label}</option>)}
           </select>
         </div>
         <div className="field">
-          <label>解读体系</label>
+          <label>{t('fortune.gender')}</label>
+          <select value={form.gender} onChange={set('gender')}>
+            <option value="女">{t('fortune.female')}</option>
+            <option value="男">{t('fortune.male')}</option>
+          </select>
+        </div>
+        <div className="field">
+          <label>{t('fortune.mode')}</label>
           <select value={form.mode} onChange={set('mode')}>
-            <option value="bazi">八字四柱</option>
-            <option value="ziwei">紫微斗数</option>
+            <option value="bazi">{t('fortune.bazi')}</option>
+            <option value="ziwei">{t('fortune.ziwei')}</option>
           </select>
         </div>
       </div>
-      <div style={{ textAlign: 'center', marginTop: 24 }}>
-        <button className="btn btn-primary" disabled={loading} onClick={() => onSubmit(form)}>
-          {loading ? '星盘推演中…' : '✦ 开始解读'}
+      <div style={{ textAlign: 'center', marginTop: 26 }}>
+        <button className="btn btn-gold btn-lg" disabled={loading} onClick={() => onSubmit(form)}>
+          {loading ? t('fortune.loading') : `✦ ${t('fortune.submit')}`}
         </button>
       </div>
-      <p className="disclaimer">时辰不详也可排盘（部分宫位精度略降）；数据仅用于本次解读，不会被存储。</p>
+      <p className="disclaimer">{t('fortune.formNote')}</p>
     </div>
   );
 }
@@ -132,6 +135,7 @@ function ChartCard({ chart, mode }) {
 
 /* ------------------------- 主页面 ------------------------- */
 export default function Fortune() {
+  const { t } = useI18n();
   const [started, setStarted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState('bazi');
@@ -186,19 +190,20 @@ export default function Fortune() {
   };
 
   return (
-    <div>
+    <div className="fortune-page container">
+      <header className="page-head">
+        <span
+          className="page-head-sigil"
+          aria-hidden="true"
+          style={{ backgroundImage: `url(${import.meta.env.BASE_URL}images/gen/sigil.webp)` }}
+        />
+        <span className="kicker">READING</span>
+        <h1 className="page-title">{t('fortune.title')}</h1>
+        <p className="page-sub">{t('fortune.sub')}</p>
+      </header>
+
       {engine === 'static' && (
-        <div
-          className="glass"
-          style={{
-            marginTop: 0, marginBottom: 18, padding: '12px 18px', textAlign: 'center',
-            fontSize: 13, lineHeight: 1.9, color: 'var(--text-low)',
-            borderColor: 'rgba(179,136,255,0.28)',
-          }}
-        >
-          ✦ 静态演示版：排盘在您的浏览器内完成（与服务器同一套历法引擎）·
-          解读为内置示例文本，真实 AI 解读与在线支付需部署后端（见 README）
-        </div>
+        <div className="glass static-note">✦ {t('fortune.staticTip')}</div>
       )}
 
       <BirthForm onSubmit={start} loading={loading} />
@@ -211,14 +216,14 @@ export default function Fortune() {
             {headline ? (
               <div className="headline">{headline}</div>
             ) : (
-              <p className="typing-hint">星盘解读生成中<span className="dot">.</span><span className="dot">.</span><span className="dot">.</span></p>
+              <p className="typing-hint">{t('fortune.waiting')}<span className="dot">.</span><span className="dot">.</span><span className="dot">.</span></p>
             )}
           </div>
 
           {[
-            ['summary', '🌙 总运概览', 'summary'],
-            ['love', '💞 爱情看这', 'love'],
-            ['career', '🏔 事业看这', 'career'],
+            ['summary', '🌙 总运概览'],
+            ['love', '💞 爱情看这'],
+            ['career', '🏔 事业看这'],
           ].map(([key, title]) => (
             freeText[key] && (
               <div key={key} className="glass section-block">
@@ -238,17 +243,17 @@ export default function Fortune() {
           {locked && (
             <div className="premium-card" style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 30, marginBottom: 10 }}>🔒</div>
-              <div className="premium-title" style={{ fontSize: 17 }}>还有 {locked.count} 篇完整章节等你开启</div>
+              <div className="premium-title" style={{ fontSize: 17 }}>
+                {t('fortune.lockedTitle').replace('{n}', locked.count)}
+              </div>
               <div className="blur-locked" aria-hidden="true">
                 <p className="prose" style={{ marginTop: 10 }}>
-                  {locked.titles.map((t) => `${t}：性格的底色往往在…`).join('　')}
+                  {locked.titles.map((x) => `${x}：…`).join('　')}
                 </p>
               </div>
-              <p className="disclaimer" style={{ marginTop: 14 }}>
-                {locked.titles.join(' · ')}
-              </p>
+              <p className="disclaimer" style={{ marginTop: 14 }}>{locked.titles.join(' · ')}</p>
               <button className="btn btn-gold" style={{ marginTop: 16 }} onClick={() => setShowPay(true)}>
-                ♛ ￥9.9 解锁完整报告
+                ♛ ￥9.9 {t('fortune.unlock')}
               </button>
             </div>
           )}
@@ -257,7 +262,7 @@ export default function Fortune() {
 
       {started && loading && !chart && (
         <div className="glass section-block" style={{ textAlign: 'center' }}>
-          <p className="typing-hint">正在为你排布星盘<span className="dot">.</span><span className="dot">.</span><span className="dot">.</span></p>
+          <p className="typing-hint">{t('fortune.waiting')}<span className="dot">.</span><span className="dot">.</span><span className="dot">.</span></p>
         </div>
       )}
 
