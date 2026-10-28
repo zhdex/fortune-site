@@ -4,6 +4,7 @@ import LangSwitcher from './components/LangSwitcher.jsx';
 import Home from './pages/Home.jsx';
 import Fortune from './pages/Fortune.jsx';
 import Daily from './pages/Daily.jsx';
+import Gua from './pages/Gua.jsx';
 import About from './pages/About.jsx';
 import { I18nProvider, useI18n } from './i18n/index.js';
 
@@ -11,6 +12,7 @@ const ROUTES = [
   { hash: '#/', key: 'nav.home', comp: Home },
   { hash: '#/fortune', key: 'nav.reading', comp: Fortune },
   { hash: '#/daily', key: 'nav.daily', comp: Daily },
+  { hash: '#/gua', key: 'nav.gua', comp: Gua },
   { hash: '#/about', key: 'nav.about', comp: About },
 ];
 

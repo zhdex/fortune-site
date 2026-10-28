@@ -4,7 +4,7 @@ import { CARD_ICONS } from '../components/Icons.jsx';
 import { useI18n } from '../i18n/index.js';
 import { api } from '../lib/api.js';
 
-const CardKeys = ['self', 'career', 'love', 'fortune'];
+const CardKeys = ['self', 'career', 'love', 'fortune', 'gua'];
 
 function todayStr() {
   const d = new Date();
@@ -63,13 +63,14 @@ function Hero() {
 function CardMedallion({ k }) {
   const [broken, setBroken] = useState(false);
   const Icon = CARD_ICONS[k];
+  const file = k === 'gua' ? 'gua-taiji' : `icon-${k}`;
   return (
     <span className="medallion-icon">
-      {broken
-        ? <Icon />
+      {broken || !Icon
+        ? <span className="medallion-fallback">☯</span>
         : (
           <img
-            src={`${import.meta.env.BASE_URL}images/gen/icon-${k}.webp`}
+            src={`${import.meta.env.BASE_URL}images/gen/${file}.webp`}
             alt=""
             loading="lazy"
             onError={() => setBroken(true)}
@@ -78,6 +79,8 @@ function CardMedallion({ k }) {
     </span>
   );
 }
+
+const CARD_LINK = { fortune: '#/daily', gua: '#/gua' };
 
 function ServiceCards() {
   const { t } = useI18n();
@@ -89,7 +92,7 @@ function ServiceCards() {
             key={k}
             className="service-card"
             style={{ animationDelay: `${i * 90}ms` }}
-            onClick={() => { window.location.hash = k === 'fortune' ? '#/daily' : '#/fortune'; }}
+            onClick={() => { window.location.hash = CARD_LINK[k] || '#/fortune'; }}
           >
             <span className="card-ornament tl" />
             <span className="card-ornament tr" />
@@ -156,9 +159,9 @@ function DailyStrip() {
     <section className="daily-strip container">
       <div className="daily-inner">
         <div className="daily-left">
-          <span className="kicker">TODAY</span>
-          <h2 className="section-h2">{t('daily.title')}</h2>
-          <p className="section-sub">{t('daily.sub')}</p>
+          <span className="kicker">DAILY QUIZ</span>
+          <h2 className="section-h2">{t('quiz.title')}</h2>
+          <p className="section-sub">{t('quiz.sub')}</p>
           {data?.daily && (
             <div className="daily-meta">
               <span className="chip gold">{data.daily.dayGanzhi}</span>
@@ -169,25 +172,15 @@ function DailyStrip() {
 
         <div className="daily-right">
           {!data && !failed && <div className="daily-skeleton"><span /><span /><span /></div>}
-          {failed && <p className="daily-fallback">{t('daily.more')}</p>}
           {data?.daily && (
-            <div className="yiji">
-              <div className="yiji-box yiji-yi">
-                <div className="yiji-tag">{t('daily.yi')}</div>
-                <div className="yiji-words">
-                  {data.daily.yi.slice(0, 4).map((w) => <span key={w} className="word">{w}</span>)}
-                </div>
-              </div>
-              <div className="yiji-box yiji-ji">
-                <div className="yiji-tag">{t('daily.ji')}</div>
-                <div className="yiji-words">
-                  {data.daily.ji.slice(0, 4).map((w) => <span key={w} className="word">{w}</span>)}
-                </div>
-              </div>
-            </div>
+            <ul className="quiz-points">
+              <li><span className="dot-mark">◆</span>{t('quiz.items')}</li>
+              <li><span className="dot-mark">◆</span>{t('quiz.lucky')}</li>
+              <li><span className="dot-mark">◆</span>{t('quiz.week')}</li>
+            </ul>
           )}
-          <button className="btn btn-ghost btn-sm daily-cta" onClick={() => { window.location.hash = '#/daily'; }}>
-            {t('daily.more')}
+          <button className="btn btn-gold btn-sm daily-cta" onClick={() => { window.location.hash = '#/daily'; }}>
+            {t('quiz.run')}
           </button>
         </div>
       </div>

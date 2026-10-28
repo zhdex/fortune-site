@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { streamInterpret, getTokens, ensureMode, onModeChange } from '../lib/api.js';
+import { streamInterpret, ensureMode, onModeChange, getEntitlements } from '../lib/api.js';
 import PayModal from '../components/PayModal.jsx';
+import WuxingEnergy from '../components/WuxingEnergy.jsx';
+import { PRODUCTS, readingPrices, scopeCovers } from '../../../shared/catalog.mjs';
 import { useI18n } from '../i18n/index.js';
 
 const YEARS = Array.from({ length: 101 }, (_, i) => 2026 - i);
@@ -12,7 +14,10 @@ const HOURS = [
   ['申时 15-17', 15], ['酉时 17-19', 17], ['戌时 19-21', 19], ['亥时 21-23', 21],
 ];
 
+const SECTIONS = ['summary', 'love', 'career'];
+
 /* ------------------------- 生辰表单 ------------------------- */
+
 function BirthForm({ onSubmit, loading }) {
   const { t } = useI18n();
   const [form, setForm] = useState({ year: 1995, month: 8, day: 15, hour: -1, gender: '女', mode: 'bazi' });
@@ -64,76 +69,44 @@ function BirthForm({ onSubmit, loading }) {
   );
 }
 
-/* ------------------------- 排盘展示 ------------------------- */
-function ChartCard({ chart, mode }) {
-  if (mode === 'bazi') {
+/* ------------------------- 三段（免费预览 + 上锁） ------------------------- */
+
+function SectionCard({ data, onUnlock }) {
+  const { t } = useI18n();
+  const label = t(`fortune.sections.${data.section}`);
+
+  if (data.unlocked) {
     return (
       <div className="glass section-block">
-        <h3 className="section-title">八字排盘</h3>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
-          <span className="chip">公历 {chart.birth?.solar?.slice(0, 10)}</span>
-          <span className="chip">{chart.birth?.shichen}</span>
-          <span className="chip">农历 {chart.lunar}</span>
-          <span className="chip gold">属{chart.zodiac}</span>
-        </div>
-        <div className="pillars">
-          {chart.pillars.map((p) => (
-            <div key={p.label} className="pillar">
-              <div className="label">{p.label}</div>
-              <div className="gan-zhi">{p.gan}{p.zhi}</div>
-              <div className="meta">{p.wuxing}<br />{p.nayin}</div>
-            </div>
-          ))}
-        </div>
-        <div style={{ marginTop: 18, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-          <span className="chip gold">日主：{chart.dayMaster.gan} · {chart.dayMaster.wuxing}</span>
-          <span className="chip">五行最旺：{chart.wuxing.strongest}</span>
-          <span className="chip">五行最弱：{chart.wuxing.weakest}</span>
-          {chart.wuxing.missing.length > 0 && <span className="chip">五行缺：{chart.wuxing.missing.join('、')}</span>}
-        </div>
-        {chart.dayun?.length > 0 && (
-          <div style={{ marginTop: 14 }}>
-            <p style={{ color: 'var(--text-low)', fontSize: 13, letterSpacing: 2, marginBottom: 6 }}>大运节律</p>
-            <div className="tag-row">
-              {chart.dayun.slice(0, 8).map((d) => (
-                <span key={d.ganzhi + d.startAge} className="chip">{d.startAge}-{d.endAge}岁 {d.ganzhi}</span>
-              ))}
-            </div>
-          </div>
-        )}
+        <h3 className="section-title">{label}</h3>
+        <p className="prose">{data.text}</p>
       </div>
     );
   }
+
+  const rest = Math.max(0, (data.total || 0) - (data.teaser || '').length);
   return (
-    <div className="glass section-block">
-      <h3 className="section-title">紫微命盘</h3>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
-        <span className="chip gold">命主：{chart.soul}</span>
-        <span className="chip">身宫：{chart.body}</span>
-        <span className="chip">{chart.fiveElementsClass}</span>
-        <span className="chip">{chart.shichen}</span>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: 10 }}>
-        {chart.palaces.map((p) => (
-          <div key={p.name + p.branch} className="pillar" style={p.name === '命宫' ? { borderColor: 'rgba(245,215,142,0.45)' } : undefined}>
-            <div className="label">
-              {p.name}{p.isBody ? ' · 身' : ''}（{p.branch}{p.stem}）
-            </div>
-            <div className="meta" style={{ fontSize: 13.5, color: 'var(--text-mid)', marginTop: 6 }}>
-              {p.majorStars.length
-                ? p.majorStars.map((s) => `${s.name}${s.brightness}${s.mutagen ? '·化' + s.mutagen : ''}`).join('　')
-                : <span style={{ color: 'var(--text-low)' }}>无主星，借对宫</span>}
-              {p.minorStars.length > 0 && <span style={{ color: 'var(--text-low)', fontSize: 12 }}>　{p.minorStars.join('、')}</span>}
-            </div>
-            {p.decadal && <div style={{ color: 'var(--text-low)', fontSize: 11, marginTop: 6 }}>{p.decadal[0]}-{p.decadal[1]} 大限</div>}
-          </div>
-        ))}
+    <div className="glass section-block section-locked">
+      <h3 className="section-title">{label}</h3>
+      <p className="prose teaser">
+        {data.teaser}
+        <span className="teaser-fade" aria-hidden="true" />
+      </p>
+      <div className="lock-bar">
+        <span className="lock-ico" aria-hidden="true">🔒</span>
+        <span className="lock-text">
+          {t('fortune.lockNote').replace('{n}', rest)}
+        </span>
+        <button className="btn btn-gold btn-sm" onClick={() => onUnlock(`chapter:${data.section}`)}>
+          {t('fortune.unlockSection')} ${Number(data.price).toFixed(2)}
+        </button>
       </div>
     </div>
   );
 }
 
 /* ------------------------- 主页面 ------------------------- */
+
 export default function Fortune() {
   const { t } = useI18n();
   const [started, setStarted] = useState(false);
@@ -141,12 +114,13 @@ export default function Fortune() {
   const [mode, setMode] = useState('bazi');
   const [chart, setChart] = useState(null);
   const [headline, setHeadline] = useState('');
-  const [freeText, setFreeText] = useState({ summary: '', love: '', career: '' });
-  const [premium, setPremium] = useState([]);
-  const [locked, setLocked] = useState(null);
+  const [sections, setSections] = useState({});
+  const [chapters, setChapters] = useState([]);
+  const [chapterLock, setChapterLock] = useState(null);
   const [done, setDone] = useState(false);
-  const [showPay, setShowPay] = useState(false);
-  const [engine, setEngine] = useState('unknown'); // server=连后端真实AI | static=浏览器本地演示
+  const [engine, setEngine] = useState('unknown');
+  const [paying, setPaying] = useState(null);
+  const [error, setError] = useState('');
   const abortRef = useRef(null);
   const reportRef = useRef(null);
   const lastInputRef = useRef(null);
@@ -157,37 +131,57 @@ export default function Fortune() {
     return off;
   }, []);
 
-  const start = ({ mode: m, ...input }) => {
-    setMode(m);
+  useEffect(() => () => abortRef.current?.(), []);
+
+  const start = (payload) => {
+    const { mode: m, ...rest } = payload;
+    const input = {
+      year: Number(rest.year),
+      month: Number(rest.month),
+      day: Number(rest.day),
+      hour: Number(rest.hour) < 0 ? 12 : Number(rest.hour),
+      gender: rest.gender,
+    };
+    setMode(m || 'bazi');
     setLoading(true);
     setStarted(true);
-    setChart(null); setHeadline(''); setFreeText({ summary: '', love: '', career: '' });
-    setPremium([]); setLocked(null); setDone(false);
-    const payload = {
-      year: Number(input.year),
-      month: Number(input.month),
-      day: Number(input.day),
-      hour: Number(input.hour) < 0 ? 12 : Number(input.hour), // 时辰未知按午时排
-      gender: input.gender,
-    };
-    lastInputRef.current = { mode: m, ...payload };
-    const token = getTokens()[m] || '';
+    setError('');
+    setChart(null);
+    setHeadline('');
+    setSections({});
+    setChapters([]);
+    setChapterLock(null);
+    setDone(false);
+    lastInputRef.current = { mode: m || 'bazi', ...input };
+
     abortRef.current?.();
     abortRef.current = streamInterpret({
-      type: m,
-      input: payload,
-      token,
+      type: m || 'bazi',
+      input,
       handlers: {
-        onChart: (d) => { setChart(d.chart); setLoading(false); setTimeout(() => reportRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150); },
+        onChart: (d) => {
+          setChart(d.chart);
+          setLoading(false);
+          setTimeout(() => reportRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 160);
+        },
         onHeadline: setHeadline,
-        onDelta: (d) => setFreeText((prev) => ({ ...prev, [d.section]: (prev[d.section] || '') + d.text })),
-        onPremium: (s) => setPremium((prev) => [...prev, s]),
-        onLocked: (d) => setLocked(d),
+        onSection: (d) => setSections((prev) => ({ ...prev, [d.section]: d })),
+        onChapter: (c) => setChapters((prev) => [...prev, c]),
+        onChapterLock: setChapterLock,
         onDone: () => setDone(true),
-        onError: () => setLoading(false),
+        onError: (e) => { setLoading(false); setError(e.message || '解读失败'); },
       },
     });
   };
+
+  const afterPay = () => {
+    setPaying(null);
+    if (lastInputRef.current) start(lastInputRef.current);
+  };
+
+  const anyLocked = SECTIONS.some((k) => sections[k] && !sections[k].unlocked);
+  const prices = readingPrices();
+  const bundleOwned = scopeCovers(getEntitlements(), 'ch:all');
 
   return (
     <div className="fortune-page container">
@@ -202,63 +196,9 @@ export default function Fortune() {
         <p className="page-sub">{t('fortune.sub')}</p>
       </header>
 
-      {engine === 'static' && (
-        <div className="glass static-note">✦ {t('fortune.staticTip')}</div>
-      )}
+      {engine === 'static' && <div className="glass static-note">✦ {t('fortune.staticTip')}</div>}
 
       <BirthForm onSubmit={start} loading={loading} />
-
-      {started && chart && (
-        <div ref={reportRef}>
-          <ChartCard chart={chart} mode={mode} />
-
-          <div className="glass section-block" style={{ textAlign: 'center' }}>
-            {headline ? (
-              <div className="headline">{headline}</div>
-            ) : (
-              <p className="typing-hint">{t('fortune.waiting')}<span className="dot">.</span><span className="dot">.</span><span className="dot">.</span></p>
-            )}
-          </div>
-
-          {[
-            ['summary', '🌙 总运概览'],
-            ['love', '💞 爱情看这'],
-            ['career', '🏔 事业看这'],
-          ].map(([key, title]) => (
-            freeText[key] && (
-              <div key={key} className="glass section-block">
-                <h3 className="section-title">{title}</h3>
-                <p className={`prose ${done ? '' : 'caret'}`}>{freeText[key]}</p>
-              </div>
-            )
-          ))}
-
-          {premium.map((s) => (
-            <div key={s.title} className="premium-card">
-              <div className="premium-title">♛ {s.title}</div>
-              <p className="prose" style={{ marginTop: 10 }}>{s.content}</p>
-            </div>
-          ))}
-
-          {locked && (
-            <div className="premium-card" style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 30, marginBottom: 10 }}>🔒</div>
-              <div className="premium-title" style={{ fontSize: 17 }}>
-                {t('fortune.lockedTitle').replace('{n}', locked.count)}
-              </div>
-              <div className="blur-locked" aria-hidden="true">
-                <p className="prose" style={{ marginTop: 10 }}>
-                  {locked.titles.map((x) => `${x}：…`).join('　')}
-                </p>
-              </div>
-              <p className="disclaimer" style={{ marginTop: 14 }}>{locked.titles.join(' · ')}</p>
-              <button className="btn btn-gold" style={{ marginTop: 16 }} onClick={() => setShowPay(true)}>
-                ♛ ￥9.9 {t('fortune.unlock')}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
 
       {started && loading && !chart && (
         <div className="glass section-block" style={{ textAlign: 'center' }}>
@@ -266,16 +206,99 @@ export default function Fortune() {
         </div>
       )}
 
-      {showPay && (
-        <PayModal
-          type={mode}
-          onClose={() => setShowPay(false)}
-          onPaid={() => {
-            setShowPay(false);
-            if (lastInputRef.current) start(lastInputRef.current); // 凭新令牌重放，带出付费章节
-          }}
-        />
+      {error && <div className="glass section-block static-note">⚠ {error}</div>}
+
+      {chart && (
+        <div ref={reportRef}>
+          {/* 五行能量：替代原先难懂的四柱排盘 */}
+          {mode === 'bazi'
+            ? <WuxingEnergy chart={chart} />
+            : <ZiweiSummary chart={chart} />}
+
+          <div className="glass section-block" style={{ textAlign: 'center' }}>
+            {headline
+              ? <div className="headline">{headline}</div>
+              : <p className="typing-hint">{t('fortune.waiting')}<span className="dot">.</span><span className="dot">.</span><span className="dot">.</span></p>}
+          </div>
+
+          {SECTIONS.map((k) => (sections[k] ? <SectionCard key={k} data={sections[k]} onUnlock={setPaying} /> : null))}
+
+          {anyLocked && !bundleOwned && (
+            <div className="bundle-card glass-strong">
+              <div className="bundle-info">
+                <h4>{t('fortune.bundleTitle')}</h4>
+                <p>{t('fortune.bundleSub').replace('{save}', prices.saving.toFixed(2))}</p>
+              </div>
+              <button className="btn btn-gold" onClick={() => setPaying('bundle:reading')}>
+                {t('fortune.bundleCta')} ${Number(prices.bundle).toFixed(2)}
+              </button>
+            </div>
+          )}
+
+          {chapters.length > 0 && (
+            <section className="chapters">
+              <h3 className="section-title">{t('fortune.chapters')}</h3>
+              {chapters.map((c) => (
+                <div key={c.title} className="premium-card">
+                  <div className="premium-title">♛ {c.title}</div>
+                  <p className="prose" style={{ marginTop: 10 }}>{c.content}</p>
+                </div>
+              ))}
+            </section>
+          )}
+
+          {chapters.length === 0 && chapterLock && (
+            <div className="premium-card" style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>🔒</div>
+              <div className="premium-title" style={{ fontSize: 16 }}>
+                {t('fortune.chaptersLocked').replace('{n}', chapterLock.count)}
+              </div>
+              <div className="blur-locked" aria-hidden="true">
+                <p className="prose" style={{ marginTop: 10 }}>{chapterLock.titles.join('　')}</p>
+              </div>
+              <button className="btn btn-gold" style={{ marginTop: 14 }} onClick={() => setPaying('bundle:reading')}>
+                {t('fortune.bundleCta')} ${Number(prices.bundle).toFixed(2)}
+              </button>
+            </div>
+          )}
+
+          {done && (
+            <div style={{ textAlign: 'center', marginTop: 22 }}>
+              <button className="btn btn-ghost btn-sm" onClick={() => lastInputRef.current && start(lastInputRef.current)}>
+                ↻ {t('fortune.redo')}
+              </button>
+            </div>
+          )}
+        </div>
       )}
+
+      {paying && <PayModal product={paying} onClose={() => setPaying(null)} onPaid={afterPay} />}
     </div>
+  );
+}
+
+/* ------------------------- 紫微：只留易懂的部分 ------------------------- */
+
+function ZiweiSummary({ chart }) {
+  const { t } = useI18n();
+  const life = chart?.palaces?.find((p) => p.name === '命宫');
+  const stars = life?.majorStars?.map((s) => s.name) || [];
+  return (
+    <section className="wuxing glass section-block">
+      <h3 className="section-title">{t('fortune.ziweiTitle')}</h3>
+      <div className="wx-chips" style={{ marginBottom: 12 }}>
+        <span className="chip gold">{t('fortune.soul')}：{chart?.soul}</span>
+        <span className="chip">{chart?.fiveElementsClass}</span>
+        <span className="chip">{chart?.shichen}</span>
+      </div>
+      <div className="ziwei-stars">
+        {(stars.length ? stars : ['—']).map((s) => <span key={s} className="ziwei-star">{s}</span>)}
+      </div>
+      <p className="wx-advice">
+        {stars.length
+          ? `${t('fortune.ziweiNote')}：${stars.slice(0, 3).join('、')}`
+          : t('fortune.ziweiEmpty')}
+      </p>
+    </section>
   );
 }

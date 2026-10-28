@@ -1,60 +1,74 @@
 import React, { useState } from 'react';
-import { api, saveToken } from '../lib/api.js';
+import { purchase } from '../lib/api.js';
+import { PRODUCTS, priceText } from '../../../shared/catalog.mjs';
+import { useI18n } from '../i18n/index.js';
 
 /**
- * 模拟支付弹窗（占位）：
- * 创建订单 → 点确认"支付" → 获得解锁令牌并写入 localStorage。
+ * 模拟支付弹窗（占位）
+ * props.product 为 shared/catalog.mjs 里的商品键，例如 'chapter:love' / 'daily:year' / 'bundle:reading'
+ * 确认后：后端模式签发 HMAC 令牌，静态模式写入本地演示凭证；两种模式都落到同一个凭证仓。
  */
-export default function PayModal({ type, onClose, onPaid }) {
-  const [step, setStep] = useState('confirm'); // confirm | paying | done
-  const [order, setOrder] = useState(null);
+export default function PayModal({ product, onClose, onPaid }) {
+  const { t } = useI18n();
+  const p = PRODUCTS[product];
+  const [step, setStep] = useState('confirm'); // confirm | paying | done | error
 
-  const doPay = async () => {
+  if (!p) return null;
+
+  const pay = async () => {
     setStep('paying');
     try {
-      const o = order || (await api.payCreate(type));
-      if (!order) setOrder(o);
-      // 模拟支付通道耗时
-      await new Promise((r) => setTimeout(r, 1400));
-      const result = await api.payConfirm(o.orderId, type);
-      saveToken(type, result.token);
+      await purchase(product);
       setStep('done');
-      setTimeout(() => onPaid?.(), 900);
+      setTimeout(() => onPaid?.(), 850);
     } catch {
-      setStep('confirm');
-      alert('支付异常，请重试');
+      setStep('error');
     }
   };
 
   return (
-    <div className="modal" style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15,8,40,0.72)', backdropFilter: 'blur(8px)' }} onClick={onClose}>
-      <div className="glass modal" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-mask" onClick={onClose}>
+      <div className="modal glass-strong" onClick={(e) => e.stopPropagation()}>
         {step === 'confirm' && (
           <>
-            <h3>解锁完整命盘报告</h3>
-            <div className="price"><small>￥</small>9.9</div>
+            <h3>{t('pay.title')}</h3>
+            <div className="pay-product">{p.title}</div>
+            <div className="price"><small>$</small>{Number(p.price).toFixed(2)}</div>
             <p className="desc">
-              性格底色 · 爱情婚姻详批 · 事业财运 · 健康提醒 · 2026 流年提示 · 开运建议
+              {t('pay.desc')}
               <br />
-              一次解锁，永久回看 · 当前为演示支付，确认即到账
+              {t('pay.demo')}
             </p>
             <div className="actions">
-              <button className="btn btn-gold" onClick={doPay}>立即解锁</button>
-              <button className="btn btn-ghost btn-sm" onClick={onClose}>再想想</button>
+              <button className="btn btn-gold" onClick={pay}>{t('pay.confirm')}</button>
+              <button className="btn btn-ghost btn-sm" onClick={onClose}>{t('pay.cancel')}</button>
             </div>
           </>
         )}
+
         {step === 'paying' && (
           <div style={{ padding: '30px 0' }}>
             <div style={{ fontSize: 42, marginBottom: 16 }}>🔮</div>
-            <p style={{ color: 'var(--text-mid)', letterSpacing: 2 }}>正在唤起星辉支付通道<span className="dot">.</span><span className="dot">.</span><span className="dot">.</span></p>
+            <p className="typing-hint">{t('pay.paying')}<span className="dot">.</span><span className="dot">.</span><span className="dot">.</span></p>
           </div>
         )}
+
         {step === 'done' && (
           <div style={{ padding: '18px 0' }}>
             <div style={{ fontSize: 42, marginBottom: 12 }}>🌟</div>
-            <h3>解锁成功</h3>
-            <p className="desc" style={{ marginTop: 10 }}>命盘的全部星光，正在为你展开…</p>
+            <h3>{t('pay.done')}</h3>
+            <p className="desc" style={{ marginTop: 10 }}>{t('pay.doneNote')}</p>
+          </div>
+        )}
+
+        {step === 'error' && (
+          <div style={{ padding: '18px 0' }}>
+            <div style={{ fontSize: 38, marginBottom: 12 }}>⚠️</div>
+            <h3>{t('pay.error')}</h3>
+            <div className="actions" style={{ marginTop: 16 }}>
+              <button className="btn btn-gold" onClick={pay}>{t('pay.retry')}</button>
+              <button className="btn btn-ghost btn-sm" onClick={onClose}>{t('pay.cancel')}</button>
+            </div>
           </div>
         )}
       </div>

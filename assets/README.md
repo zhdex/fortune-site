@@ -110,7 +110,33 @@ q.run(prompt=PROMPT, ratio="1:1 (Square)", mp=1)
 
 ---
 
-## 三、screenshots/ —— 验收截图
+## 三、generated/ 第二批（v3：五行 / 每日场景 / 八卦）
+
+同一套 qwen_image_2.1、同一句透明底提示词模板，`1:1 (Square)` + `mp=1`。
+
+| 原图 | 用途 | 站点产物 | 体积 |
+|---|---|---|---|
+| `wuxing-wood.png` | 五行·木（树与根） | `gen/wuxing-wood.webp`（192²） | 21 KB |
+| `wuxing-fire.png` | 五行·火（火焰） | `gen/wuxing-fire.webp` | 15 KB |
+| `wuxing-earth.png` | 五行·土（山峦） | `gen/wuxing-earth.webp` | 9 KB |
+| `wuxing-metal.png` | 五行·金（晶石） | `gen/wuxing-metal.webp` | 11 KB |
+| `wuxing-water.png` | 五行·水（浪花） | `gen/wuxing-water.webp` | 7 KB |
+| `scene-contract.png` | 今日宜忌·签约合作 | `gen/scene-contract.webp`（168²） | 9 KB |
+| `scene-document.png` | 文书往来 | `gen/scene-document.webp` | 13 KB |
+| `scene-exam.png` | 考试答题 | `gen/scene-exam.webp` | 9 KB |
+| `scene-defense.png` | 答辩陈述 | `gen/scene-defense.webp` | 11 KB |
+| `scene-meeting.png` | 开会沟通 | `gen/scene-meeting.webp` | 9 KB |
+| `scene-interview.png` | 面试求职 | `gen/scene-interview.webp` | 10 KB |
+| `scene-date.png` | 约会表白 | `gen/scene-date.webp` | 12 KB |
+| `scene-travel.png` | 出行安排 | `gen/scene-travel.webp` | 9 KB |
+| `scene-shopping.png` | 大额消费 | `gen/scene-shopping.webp` | 6 KB |
+| `scene-outfit.png` | 穿衣配色（备用视觉） | `gen/scene-outfit.webp` | 11 KB |
+| `gua-taiji.png` | 一日一卦页标题背后的太极八卦盘 | `gen/gua-taiji.webp`（560²） | 99 KB |
+
+生成脚本与提示词写法同上一节；补拍/替换时保持文件名一致即可，页面无需改动。
+另有 4 张（interview / date / travel / shopping）是第二批补提交，序号 03163–03166。
+
+## 四、screenshots —— 验收截图
 
 | 文件 | 说明 |
 |---|---|
@@ -132,7 +158,7 @@ msedge --headless=new --disable-gpu --hide-scrollbars --force-prefers-reduced-mo
 
 ---
 
-## 四、重新生成 / 替换素材的注意点
+## 五、重新生成 / 替换素材的注意点
 
 1. **不要直接替换 `generated/` 里的原图**再重新导出，先把旧文件按 `名字_v2.png` 另存，保留版本对比。
 2. 导出到 `web/public/images/gen/` 时保持**同名**，页面无需改动。

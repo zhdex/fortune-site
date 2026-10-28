@@ -7,7 +7,10 @@
 ```
 星阑文化/
 ├── shared/            # 前后端【共用】引擎（纯 JS，浏览器与 Node 都可用）
-│   ├── charts.mjs     # 排盘：八字（lunar-javascript）+ 紫微（iztro）+ 黄历
+│   ├── charts.mjs     # 排盘：八字（lunar-javascript）+ 紫微（iztro）+ 黄历 + 五行能量/强弱
+│   ├── dailyQuiz.mjs  # 每日运势小测验：生肖 + 星座 + 五行 → 能量分 / 幸运色 / 场景宜忌
+│   ├── divination.mjs # 一日一卦：八卦、六十四卦全表、梅花易数时间起卦（本卦/变卦/互卦）
+│   ├── catalog.mjs    # 商品目录与价格（前后端同源，静态版也同价）
 │   └── interpret.mjs  # 演示解读文案 + 流式分片（无后端时的本地回退）
 ├── server/            # Express 后端
 │   ├── index.mjs      # 路由：排盘 / AI 流式解读(SSE) / 模拟支付 / 每日运势
@@ -18,7 +21,7 @@
 │   ├── src/i18n/             # 三语词库与切换机制（简中 / 繁中 / English）
 │   ├── src/components/       # Nav / LangSwitcher / Mandala(SVG 符印) / Icons / StarField / PayModal
 │   ├── src/lib/api.js        # 自动探测后端；不可用则回退本地引擎
-│   └── src/pages/            # Home / Fortune(命盘解读) / Daily(每日运势) / About
+│   ├── src/pages/            # Home / Fortune(命盘解读) / Daily(当日测验) / Gua(一日一卦) / About
 ├── assets/            # 素材归档（项目自包含）：source 原始素材 / generated ComfyUI 原图 / screenshots 验收截图
 ├── .github/workflows/deploy.yml  # 推送到 main 自动构建并部署 GitHub Pages
 ├── .env.example       # 环境变量样例
@@ -33,6 +36,20 @@
 - **无障碍**：尊重系统 `prefers-reduced-motion`，关闭动画并取消错峰延迟。
 - **素材出处**：每张图的原始文件、生成提示词、优化参数都记在 [`assets/README.md`](assets/README.md)，
   换台机器也能照着重做；站点实际引用的图在 `web/public/images/`。
+
+## 功能与定价（v3）
+
+| 单元 | 看什么 | 免费 | 付费 |
+|---|---|---|---|
+| **命盘解读** | 不摆四柱，直接给**五行能量**（木火土金水各几股 + 日主强弱 + 补什么），再给总运 / 爱情 / 事业三段 | 每段露约一半预览 | 单篇 **$3.99**；三点整体 **$9.99**（单买 $11.97，省 $1.98），整体解锁另含 6 篇深度章节 |
+| **每日运势小测验** | 输入生日 → 生肖 + 星座 + 五行 → 今日能量分、幸运色/忌用色，以及**签约、文书、考试、答辩、会谈、面试、约会、出行、消费** 9 项宜忌 + 未来 7 天 | 生肖/星座/五行/能量分/幸运色 + 2 项场景 | **$0.99/日**、**$11.99/月**、**$29.99/半年**、**$49.99/年**（年卡一年有效，含每日运势 + 命盘三点 + 一日一卦） |
+| **一日一卦** | 写下一个问题 → 梅花易数时间起卦，出本卦、动爻、变卦、互卦 | 卦象 + 卦名 + 一句话断语 | **$1.99** 解锁深度解读（动爻转折、变卦走向、应期提示） |
+
+> 已彻底移除旧黄历里的"动土、修屋、安葬"等事项，全部换成本代人的真实场景。
+
+**权限模型**：支付确认后，后端签发带 `scope` 的 HMAC 令牌（`ch:summary` / `ch:love` / `ch:career` / `ch:all` / `daily` / `gua`），
+前端把凭证存进 `localStorage`（`xinglan_vault_v2`）；解读/测验/起卦接口按 scope 决定下发全文还是预览。
+静态托管没有后端时，凭证由浏览器本地签发并同样按 scope 判定——所以 Pages 上的付费流程能完整演示。
 
 ## 在线演示（GitHub Pages）
 

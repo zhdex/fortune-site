@@ -1,21 +1,19 @@
 /**
- * API 客户端
- * 优先连接后端（真实 AI 解读 + HMAC 付费令牌）；
- * 若后端不可用（例如 GitHub Pages 静态托管），自动回退为浏览器本地引擎（演示模式）。
+ * 星阑文化 · API 客户端
+ * 有后端 → 走后端（真实 AI + HMAC 令牌校验）；无后端（GitHub Pages）→ 本地引擎，权限用本地凭证仓判定。
+ * 两种模式对外接口完全一致，页面代码无需分叉。
  */
-import { localBazi, localZiwei, localDaily, localStream } from './localEngine.js';
+import { PRODUCTS, scopeCovers } from '../../../shared/catalog.mjs';
+import { localBazi, localZiwei, localDaily, localQuiz, localGua, localStream } from './localEngine.js';
 
 const API_BASE = 'api';
 
-let serverUp = null; // null=未知, true=有后端, false=静态模式
+let serverUp = null;
 let mode = 'unknown';
 const modeListeners = new Set();
 
-export function getMode() {
-  return mode;
-}
+export function getMode() { return mode; }
 
-/** 订阅模式变化（'server' | 'static'） */
 export function onModeChange(fn) {
   modeListeners.add(fn);
   if (mode !== 'unknown') fn(mode);
@@ -28,7 +26,6 @@ function setMode(m) {
   modeListeners.forEach((fn) => fn(m));
 }
 
-/** 探测后端是否可用（结果缓存，只探测一次） */
 async function detect() {
   if (serverUp !== null) return serverUp;
   try {
@@ -42,7 +39,6 @@ async function detect() {
   return serverUp;
 }
 
-/** 供页面在挂载时调用，确保模式已确定 */
 export async function ensureMode() {
   await detect();
   return mode;
@@ -61,36 +57,119 @@ async function post(path, body) {
   return res.json();
 }
 
-/** 静态模式下的演示订单与解锁标记（本地生成，仅用于演示） */
-function localOrder(type) {
-  return {
-    orderId: 'XL' + Date.now().toString(36).toUpperCase(),
-    type,
-    amount: 9.9,
-    subject: '星阑文化 · 完整命盘报告',
-    status: 'pending',
-    demo: true,
-  };
+/* --------------------- 购买凭证仓 --------------------- */
+
+const VAULT_KEY = 'xinglan_vault_v2';
+
+export function getVault() {
+  try {
+    const v = JSON.parse(localStorage.getItem(VAULT_KEY));
+    if (v && Array.isArray(v.purchases)) return v;
+  } catch { /* 忽略 */ }
+  return { purchases: [] };
 }
+
+function saveVault(v) {
+  try { localStorage.setItem(VAULT_KEY, JSON.stringify(v)); } catch { /* 忽略 */ }
+}
+
+/** 全部有效 scope */
+export function getEntitlements() {
+  const now = Date.now();
+  const set = new Set();
+  for (const p of getVault().purchases) {
+    if (p.exp && p.exp < now) continue;
+    (p.scopes || []).forEach((s) => set.add(s));
+  }
+  return [...set];
+}
+
+/** 所有仍有效的令牌（发给后端校验） */
+export function getTokens() {
+  const now = Date.now();
+  return getVault().purchases.filter((p) => !p.exp || p.exp > now).map((p) => p.token).filter(Boolean);
+}
+
+export function hasScope(scope) {
+  return scopeCovers(getEntitlements(), scope);
+}
+
+export function clearVault() {
+  saveVault({ purchases: [] });
+}
+
+/* --------------------- 购买流程 --------------------- */
+
+/**
+ * 购买一个商品：返回 { product, token, scopes, exp }
+ * 后端模式走 create→confirm；静态模式本地签发演示凭证。
+ */
+export async function purchase(productKey) {
+  const product = PRODUCTS[productKey];
+  if (!product) throw new Error('未知商品');
+  const up = await detect();
+  let token = '';
+  let scopes = product.scope;
+  let exp = Date.now() + (product.ttl || 365 * 24 * 60 * 60 * 1000);
+
+  if (up) {
+    const order = await post('/pay/create', { product: productKey });
+    await new Promise((r) => setTimeout(r, 900)); // 模拟支付通道耗时
+    const done = await post('/pay/confirm', { orderId: order.orderId });
+    token = done.token;
+    scopes = done.entitlements || product.scope;
+    exp = done.expiresAt || exp;
+  } else {
+    token = `demo.${productKey}.${Date.now().toString(36)}`;
+  }
+
+  const vault = getVault();
+  vault.purchases = vault.purchases.filter((p) => p.product !== productKey);
+  vault.purchases.push({ product: productKey, token, scopes, exp, at: Date.now(), demo: !up });
+  saveVault(vault);
+  return { product: productKey, token, scopes, exp };
+}
+
+/* --------------------- 业务接口 --------------------- */
 
 export const api = {
   bazi: async (input) => ((await detect()) ? post('/bazi', input) : { input, chart: localBazi(input) }),
   ziwei: async (input) => ((await detect()) ? post('/ziwei', input) : { input, chart: localZiwei(input) }),
   daily: async (date) => ((await detect()) ? post('/daily', { date }) : localDaily(date)),
-  payCreate: async (type) => ((await detect()) ? post('/pay/create', { type }) : localOrder(type)),
-  payConfirm: async (orderId, type) => {
-    if (await detect()) return post('/pay/confirm', { orderId });
-    return { orderId, status: 'paid', token: `demo.${type}.${Date.now().toString(36)}`, demo: true };
+
+  dailyQuiz: async ({ birth, date }) => {
+    if (await detect()) return post('/daily-quiz', { birth, date, tokens: getTokens() });
+    return localQuiz({ birth, date, entitlements: getEntitlements() });
   },
-  payVerify: async (token) => {
-    if (await detect()) return post('/pay/verify', { token });
-    return { valid: Boolean(token), payload: null, demo: true };
+
+  gua: async ({ question, category, date, hour }) => {
+    if (await detect()) return post('/gua', { question, category, date, hour, tokens: getTokens() });
+    return localGua({ question, category, date, hour, entitlements: getEntitlements() });
   },
 };
 
 /* --------------------- 流式解读 --------------------- */
 
-function remoteStream({ type, input, token, handlers, onFallback }) {
+const EVENT_MAP = {
+  chart: 'onChart',
+  section: 'onSection',
+  chapter: 'onChapter',
+  chapterlock: 'onChapterLock',
+  done: 'onDone',
+  error: 'onError',
+};
+
+function dispatch(handlers, event, data) {
+  const key = EVENT_MAP[event];
+  if (!key) return;
+  if (event === 'error') {
+    handlers.onError?.(new Error(data?.message || '解读失败'));
+    return;
+  }
+  handlers[key]?.(data);
+}
+
+function remoteStream({ type, input, handlers, onFallback }) {
   const ctrl = new AbortController();
   let gotChart = false;
   (async () => {
@@ -98,7 +177,7 @@ function remoteStream({ type, input, token, handlers, onFallback }) {
       const res = await fetch(`${API_BASE}/interpret`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, input, token }),
+        body: JSON.stringify({ type, input, tokens: getTokens() }),
         signal: ctrl.signal,
       });
       if (!res.ok) throw new Error('解读服务不可用');
@@ -124,18 +203,16 @@ function remoteStream({ type, input, token, handlers, onFallback }) {
           let data = dataStr;
           try { data = JSON.parse(dataStr); } catch { /* 保留原始字符串 */ }
           if (event === 'chart') gotChart = true;
-          if (event === 'headline') handlers.onHeadline?.(typeof data === 'string' ? data : dataStr);
-          else if (event === 'chart') handlers.onChart?.(data);
-          else if (event === 'delta') handlers.onDelta?.(data);
-          else if (event === 'premium') handlers.onPremium?.(data);
-          else if (event === 'locked') handlers.onLocked?.(data);
-          else if (event === 'done') handlers.onDone?.(data);
-          else if (event === 'error') handlers.onError?.(new Error(data?.message || '解读失败'));
+          if (event === 'headline') {
+            handlers.onHeadline?.(typeof data === 'string' ? data : dataStr);
+            continue;
+          }
+          dispatch(handlers, event, data);
         }
       }
     } catch (err) {
       if (err.name === 'AbortError') return;
-      if (!gotChart) onFallback?.(); // 后端中途不可用：退回本地演示
+      if (!gotChart) onFallback?.();
       else handlers.onError?.(err);
     }
   })();
@@ -143,11 +220,11 @@ function remoteStream({ type, input, token, handlers, onFallback }) {
 }
 
 /**
- * 流式解读（自动选择后端 SSE 或本地模拟）。
- * handlers: {onChart, onHeadline, onDelta, onPremium, onLocked, onDone, onError}
+ * 流式解读。handlers:
+ *   onChart, onHeadline, onSection, onChapter, onChapterLock, onDone, onError
  * 返回取消函数。
  */
-export function streamInterpret({ type, input, token, handlers }) {
+export function streamInterpret({ type, input, handlers }) {
   let cancelRemote = null;
   let cancelLocal = null;
   let stopped = false;
@@ -157,13 +234,11 @@ export function streamInterpret({ type, input, token, handlers }) {
     if (stopped) return;
     if (up) {
       cancelRemote = remoteStream({
-        type, input, token, handlers,
-        onFallback: () => {
-          if (!stopped) cancelLocal = localStream({ type, input, token, handlers });
-        },
+        type, input, handlers,
+        onFallback: () => { if (!stopped) cancelLocal = localStream({ type, input, entitlements: getEntitlements(), handlers }); },
       });
     } else {
-      cancelLocal = localStream({ type, input, token, handlers });
+      cancelLocal = localStream({ type, input, entitlements: getEntitlements(), handlers });
     }
   })();
 
@@ -172,18 +247,4 @@ export function streamInterpret({ type, input, token, handlers }) {
     cancelRemote?.();
     cancelLocal?.();
   };
-}
-
-/* --------------------- 解锁令牌存取 --------------------- */
-
-const TOKEN_KEY = 'xinglan_unlock_tokens';
-
-export function getTokens() {
-  try { return JSON.parse(localStorage.getItem(TOKEN_KEY)) || {}; } catch { return {}; }
-}
-
-export function saveToken(type, token) {
-  const all = getTokens();
-  all[type] = token;
-  localStorage.setItem(TOKEN_KEY, JSON.stringify(all));
 }

@@ -15,6 +15,24 @@ const GAN_WUXING = { 甲: '木', 乙: '木', 丙: '火', 丁: '火', 戊: '土',
 const ZHI_WUXING = { 子: '水', 丑: '土', 寅: '木', 卯: '木', 辰: '土', 巳: '火', 午: '火', 未: '土', 申: '金', 酉: '金', 戌: '土', 亥: '水' };
 const WUXING_LIST = ['金', '木', '水', '火', '土'];
 
+/** 五行展示顺序：木火土金水（与视觉排布一致） */
+export const WUXING_ORDER = ['木', '火', '土', '金', '水'];
+
+/** 相生：X 生 SHENG[X]；相克：X 克 KE[X] */
+const SHENG = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };
+const KE = { 木: '土', 土: '水', 水: '火', 火: '金', 金: '木' };
+const SHENG_OF = Object.fromEntries(Object.entries(SHENG).map(([a, b]) => [b, a])); // 生我者
+const KE_OF = Object.fromEntries(Object.entries(KE).map(([a, b]) => [b, a])); // 克我者
+
+/** 每个五行对应的英文名与关键词（供前端直接渲染，避免再查表） */
+export const WUXING_META = {
+  木: { key: 'wood', en: 'Wood', keyword: '成长 · 生机' },
+  火: { key: 'fire', en: 'Fire', keyword: '热情 · 行动' },
+  土: { key: 'earth', en: 'Earth', keyword: '稳定 · 滋养' },
+  金: { key: 'metal', en: 'Metal', keyword: '清明 · 专注' },
+  水: { key: 'water', en: 'Water', keyword: '流动 · 丰盈' },
+};
+
 /** 时辰索引：0=早子时 … 11=亥时（iztro 约定） */
 export function timeIndexOf(hour) {
   return Math.floor((Number(hour) + 1) / 2) % 12;
@@ -54,6 +72,32 @@ export function computeBazi({ year, month, day, hour, minute, gender }) {
   const weakest = WUXING_LIST.reduce((a, b) => (count[b] < count[a] ? b : a));
   const missing = WUXING_LIST.filter((w) => count[w] === 0);
 
+  /* ---- 日主强弱与喜用（通俗版）---- */
+  const dmWx = GAN_WUXING[pillars[2].gan] || '土';
+  const shengMe = SHENG_OF[dmWx]; // 生我者（印）
+  const keMe = KE_OF[dmWx]; // 克我者（官杀）
+  const iSheng = SHENG[dmWx]; // 我生者（食伤）
+  const iKe = KE[dmWx]; // 我克者（财）
+  const support = (count[dmWx] || 0) + (count[shengMe] || 0);
+  const drain = (count[iSheng] || 0) + (count[iKe] || 0) + (count[keMe] || 0);
+  const supportRatio = Number((support / 8).toFixed(3));
+  const strength = supportRatio >= 0.5 ? 'strong' : supportRatio >= 0.375 ? 'balanced' : 'weak';
+  const favor = strength === 'strong' ? [iSheng, iKe] : [dmWx, shengMe]; // 身强宜泄耗，身弱宜生扶
+  const avoid = strength === 'strong' ? [keMe] : [keMe];
+  const elementAdvice = strength === 'strong'
+    ? `你的${dmWx}气偏旺（生扶 ${support}/8），能量不缺，缺的是出口：宜用${iSheng}的创造力与${iKe}的务实把劲儿使出去，忌再往${keMe}上硬顶。`
+    : strength === 'balanced'
+      ? `你的${dmWx}气中和（生扶 ${support}/8），属于"怎么走都行"的底子：顺境别飘，逆境别弃，节奏感是你的护身符。`
+      : `你的${dmWx}气偏弱（生扶仅 ${support}/8），需要有人托一把：多借${shengMe}的资源、${dmWx}的同类伙伴，先蓄力再出手，别硬刚${keMe}。`;
+
+  const elements = WUXING_ORDER.map((w) => ({
+    ...WUXING_META[w],
+    element: w,
+    count: count[w] || 0,
+    ratio: Number(((count[w] || 0) / 8).toFixed(3)),
+    favored: favor.includes(w),
+  }));
+
   // 大运
   let dayun = [];
   try {
@@ -71,8 +115,26 @@ export function computeBazi({ year, month, day, hour, minute, gender }) {
     lunar: `${lunar.getYearInChinese()}年 ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`,
     zodiac: lunar.getYearShengXiao(),
     pillars,
-    dayMaster: { gan: pillars[2].gan, wuxing: GAN_WUXING[pillars[2].gan] || '?' },
-    wuxing: { count, missing, weakest: `${weakest}偏弱`, strongest },
+    dayMaster: { gan: pillars[2].gan, wuxing: dmWx },
+    wuxing: {
+      count,
+      missing,
+      weakest: `${weakest}偏弱`,
+      strongest,
+      total: 8,
+      support,
+      drain,
+      supportRatio,
+      strength,
+      shengMe,
+      keMe,
+      iSheng,
+      iKe,
+      favor,
+      avoid,
+      advice: elementAdvice,
+    },
+    elements,
     dayun,
   };
 }
