@@ -18,12 +18,7 @@ function Hero() {
   return (
     <section className="hero full-bleed">
       <div className="hero-bg" aria-hidden="true">
-        <div
-          className="hero-bg-img"
-          style={{
-            backgroundImage: `url(${import.meta.env.BASE_URL}images/hero-bg.webp), url(${import.meta.env.BASE_URL}images/hero-bg.jpg)`,
-          }}
-        />
+        {/* 背景统一由 App 的全站固定底图提供，这里只负责文字侧的压暗与氛围 */}
         <div className="hero-veil" />
       </div>
 

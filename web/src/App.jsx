@@ -127,6 +127,16 @@ function Shell() {
 
   return (
     <>
+      {/* 全站固定底图：内页与首页共用同一张星河法阵，只加一层薄纱，压得轻一些 */}
+      <div className="app-bg" aria-hidden="true">
+        <div
+          className="app-bg-img"
+          style={{
+            backgroundImage: `url(${import.meta.env.BASE_URL}images/hero-bg.webp), url(${import.meta.env.BASE_URL}images/hero-bg.jpg)`,
+          }}
+        />
+        <div className="app-bg-veil" />
+      </div>
       <StarField />
       <div className="app">
         <Nav hash={hash} />

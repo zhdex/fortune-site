@@ -73,13 +73,45 @@ body {
 
 button { font-family: inherit; }
 
+/* ---------------- 全站底图（固定在视口，内页共用首页那张星河法阵） ---------------- */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.app-bg-img {
+  position: absolute;
+  inset: -2%;
+  background-size: cover;
+  background-position: center 40%;
+  background-repeat: no-repeat;
+  filter: saturate(104%) brightness(1.04);
+  transform: scale(1.03);
+}
+
+/* 薄纱：上 0.5、中段最透 0.42、底部略深，保证"看得见图、读得清字" */
+.app-bg-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(139, 108, 255, 0.12), transparent 65%),
+    linear-gradient(180deg,
+      rgba(9, 5, 24, 0.56) 0%,
+      rgba(9, 5, 24, 0.44) 26%,
+      rgba(9, 5, 24, 0.52) 62%,
+      rgba(7, 4, 20, 0.74) 100%);
+}
+
 /* ---------------- 星空画布 ---------------- */
 .starfield {
   position: fixed;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.45;
 }
 
 /* ---------------- 布局 ---------------- */
@@ -338,7 +370,10 @@ button { font-family: inherit; }
   background:
     radial-gradient(ellipse 55% 70% at 78% 42%, rgba(139, 108, 255, 0.10), transparent 62%),
     linear-gradient(96deg, rgba(6, 4, 20, 0.97) 0%, rgba(6, 4, 20, 0.92) 26%, rgba(6, 4, 20, 0.66) 44%, rgba(6, 4, 20, 0.24) 62%, rgba(6, 4, 20, 0.44) 100%),
-    linear-gradient(180deg, rgba(8, 5, 26, 0.95) 0%, rgba(8, 5, 26, 0.18) 22%, rgba(8, 5, 26, 0.05) 58%, rgba(11, 7, 26, 0.99) 100%);
+    linear-gradient(180deg, rgba(8, 5, 26, 0.95) 0%, rgba(8, 5, 26, 0.34) 24%, rgba(8, 5, 26, 0.08) 55%, rgba(8, 5, 26, 0.1) 82%, rgba(8, 5, 26, 0) 100%);
+  /* 让压暗层整体在底部淡出，避免与下方全站底图之间出现硬接缝 */
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 60%, rgba(0, 0, 0, 0.6) 82%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 60%, rgba(0, 0, 0, 0.6) 82%, transparent 100%);
 }
 
 .hero-inner {
@@ -630,6 +665,7 @@ button { font-family: inherit; }
   font-size: clamp(26px, 3.2vw, 40px);
   letter-spacing: 2px;
   color: #fbf4e6;
+  text-shadow: 0 3px 16px rgba(4, 2, 14, 0.55);
 }
 
 .section-sub {
@@ -642,7 +678,15 @@ button { font-family: inherit; }
 .section-head .section-sub { margin-left: auto; margin-right: auto; }
 
 /* ---------------- 三步 ---------------- */
-.how { padding: 110px 0 90px; }
+.how {
+  position: relative;
+  padding: 74px 36px 66px;
+  border-radius: 26px;
+  background: rgba(12, 7, 30, 0.52);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
 
 .steps {
   display: grid;
@@ -848,7 +892,15 @@ button { font-family: inherit; }
 .price-note { margin-top: 14px; font-size: 11.5px; line-height: 1.8; color: var(--dim); }
 
 /* ---------------- FAQ ---------------- */
-.faq { padding: 0 0 110px; }
+.faq {
+  padding: 44px 36px 56px;
+  border-radius: 26px;
+  background: rgba(12, 7, 30, 0.52);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  margin-bottom: 90px;
+}
 
 .faq-list { max-width: 820px; margin: 0 auto; }
 
@@ -896,7 +948,9 @@ button { font-family: inherit; }
   position: relative;
   padding: 54px 0 44px;
   border-top: 1px solid var(--line-soft);
-  background: linear-gradient(180deg, transparent, rgba(8, 5, 26, 0.8));
+  background: linear-gradient(180deg, rgba(8, 5, 26, 0.55) 0%, rgba(8, 5, 26, 0.9) 55%, rgba(6, 4, 18, 0.96) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   text-align: center;
 }
 
@@ -957,17 +1011,19 @@ button { font-family: inherit; }
    ============================================================ */
 
 .glass {
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid var(--line-soft);
+  background: rgba(16, 10, 36, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 20px 60px rgba(3, 1, 12, 0.4);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  box-shadow: 0 20px 60px rgba(3, 1, 12, 0.45);
 }
 
 .glass-strong {
-  background: rgba(22, 14, 46, 0.75);
+  background: rgba(16, 10, 36, 0.86);
   border: 1px solid var(--line);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(22px) saturate(120%);
+  -webkit-backdrop-filter: blur(22px) saturate(120%);
 }
 
 .section-block { padding: 26px 28px; margin-top: 20px; }
@@ -1143,9 +1199,9 @@ button { font-family: inherit; }
   margin-top: 20px;
   padding: 13px 18px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  color: var(--dim);
+  background: rgba(10, 6, 26, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: rgba(205, 195, 230, 0.9);
   font-size: 12px;
   line-height: 1.9;
   text-align: center;
@@ -1161,6 +1217,7 @@ button { font-family: inherit; }
 .page-head { position: relative; text-align: center; padding: 46px 0 34px; }
 
 .page-head-sigil {
+  display: none; /* 全站底图已自带法阵，内页不再叠水印 */
   position: absolute;
   top: -70px;
   left: 50%;
@@ -1185,6 +1242,7 @@ button { font-family: inherit; }
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 3px 16px rgba(4, 2, 14, 0.55));
 }
 
 .page-sub {
@@ -1194,12 +1252,21 @@ button { font-family: inherit; }
   font-size: 14.5px;
   line-height: 2;
   color: var(--muted);
+  text-shadow: 0 2px 10px rgba(4, 2, 14, 0.6);
 }
 
 /* ---------------- 关于页 ---------------- */
 .about { max-width: 880px; }
 
-.about-body { margin-top: 8px; }
+.about-body {
+  margin-top: 8px;
+  padding: 26px 30px;
+  border-radius: var(--radius);
+  background: rgba(16, 10, 36, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
 .about-body .prose + .prose { margin-top: 18px; }
 
 .about-quote {
@@ -1224,8 +1291,10 @@ button { font-family: inherit; }
 .value-card {
   padding: 22px 22px 24px;
   border-radius: 16px;
-  border: 1px solid var(--line-soft);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(16, 10, 36, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
 .value-card:hover { border-color: rgba(230, 198, 139, 0.32); transform: translateY(-3px); }
@@ -1236,17 +1305,19 @@ button { font-family: inherit; }
 /* ---------------- 排盘页 ---------------- */
 .fortune-page { max-width: 920px; }
 
-.form-card { padding: 28px 30px; }
+.form-card { padding: 28px 30px; background: rgba(15, 9, 34, 0.86); }
 
 .static-note {
   padding: 13px 18px;
   margin-bottom: 18px;
   text-align: center;
-  font-size: 12.8px;
+  font-size: 13.6px;
   line-height: 1.9;
-  color: var(--dim);
+  color: rgba(226, 216, 246, 0.92);
   border-color: rgba(230, 198, 139, 0.24);
-  background: rgba(230, 198, 139, 0.05);
+  background: rgba(16, 10, 36, 0.8);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 /* ---------------- 每日运势页 ---------------- */
