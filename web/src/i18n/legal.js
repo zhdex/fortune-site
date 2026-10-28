@@ -1,6 +1,7 @@
 /**
  * 星阑文化 · 法律文本（三语）
- * 结构：{ updated, disclaimer: { title, intro, sections:[{h,p:[…]}], footer }, refund: {…}, consent: {…} }
+ * 结构：{ updated, disclaimer: { title, intro, sections:[{h,p:[…]}], footer }, refund: {…} }
+ * 说明：免责声明为单方告知，仅展示；退款政策在付款弹窗内由用户勾选同意。
  */
 
 const zhCN = {
@@ -107,15 +108,6 @@ const zhCN = {
     ],
     footer: '提示：付款前会要求您勾选确认已阅读并同意本退款政策。',
   },
-  consent: {
-    title: '使用前请确认',
-    lead: '点击「同意」即表示您已阅读并理解上述《免责声明》与《退款政策》，并自愿购买相关数字服务。',
-    agree: '同意，继续',
-    disagree: '不同意',
-    agreed: '已记录您的同意，可以继续支付。',
-    refused: '未同意则无法完成付款；您仍可免费浏览本网站的其他内容。',
-    backHome: '返回首页',
-  },
 };
 
 const zhTW = {
@@ -211,15 +203,6 @@ const zhTW = {
       { h: '五、聯絡我們', p: ['如您對付款或退款有任何疑問，請透過本網站公布的聯絡方式與我們聯絡。'] },
     ],
     footer: '提示：付款前會要求您勾選確認已閱讀並同意本退款政策。',
-  },
-  consent: {
-    title: '使用前請確認',
-    lead: '點擊「同意」即表示您已閱讀並理解上述《免責聲明》與《退款政策》，並自願購買相關數位服務。',
-    agree: '同意，繼續',
-    disagree: '不同意',
-    agreed: '已記錄您的同意，可以繼續支付。',
-    refused: '未同意則無法完成付款；您仍可免費瀏覽本網站的其他內容。',
-    backHome: '返回首頁',
   },
 };
 
@@ -319,15 +302,6 @@ const en = {
       { h: '5. Contact us', p: ['If you have questions about payment or refunds, please contact us using the details published on this site.'] },
     ],
     footer: 'Note: before payment you will be asked to tick a box confirming that you have read and agreed to this Refund Policy.',
-  },
-  consent: {
-    title: 'Before you continue',
-    lead: 'By clicking “Agree” you confirm that you have read and understood the Disclaimer and Refund Policy above, and that you voluntarily purchase the digital service.',
-    agree: 'Agree and continue',
-    disagree: 'Do not agree',
-    agreed: 'Your consent is recorded — you can continue to payment.',
-    refused: 'Without consent, payment cannot be completed. You may still browse the free content of this site.',
-    backHome: 'Back to home',
   },
 };
 
