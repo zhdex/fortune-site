@@ -99,9 +99,11 @@ function ServiceCards() {
               <CardMedallion k={k} />
             </span>
 
-            <h3 className="card-title">{t(`cards.${k}.title`)}</h3>
-            <p className="card-desc">{t(`cards.${k}.desc`)}</p>
-            <span className="card-tag">{t(`cards.${k}.tag`)}</span>
+            <span className="card-body">
+              <h3 className="card-title">{t(`cards.${k}.title`)}</h3>
+              <p className="card-desc">{t(`cards.${k}.desc`)}</p>
+              <span className="card-tag">{t(`cards.${k}.tag`)}</span>
+            </span>
 
             <span className="card-arrow" aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">

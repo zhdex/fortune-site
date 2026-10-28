@@ -610,6 +610,13 @@ button { font-family: inherit; }
 .medallion-icon img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .service-card:hover .medallion-icon { transform: scale(1.07); color: var(--gold-hi); }
 
+.card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
 .card-title {
   font-family: var(--serif);
   font-size: 20px;
@@ -2014,6 +2021,101 @@ button { font-family: inherit; }
   .legal-h2 { font-size: 23px; }
   .consent-card { padding: 22px 18px; }
   .gua-plan-row { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   v3.3 版式：间距统一为 8 的倍数 + 16:9 / 9:16 双画幅适配
+   ============================================================ */
+
+/* 间距节奏 */
+:root {
+  --s1: 8px;
+  --s2: 12px;
+  --s3: 16px;
+  --s4: 24px;
+  --s5: 32px;
+  --s6: 48px;
+  --s7: 64px;
+}
+
+/* —— 统一主页各段的纵向节奏（桌面基准）—— */
+.services { margin-top: -56px; }
+.how { padding: var(--s7) 36px 56px; margin-bottom: var(--s7); }
+.daily-strip { padding: 0 0 var(--s7); }
+.pricing { padding: 0 0 var(--s7); }
+.faq { padding: 56px 36px; margin-bottom: var(--s6); }
+
+.daily-inner { padding: 32px 36px; }
+.pricing-card { padding: 40px 42px; }
+.section-block { padding: var(--s4) var(--s5); margin-top: var(--s3); }
+.form-card { padding: var(--s4) var(--s5); }
+.wuxing { padding: var(--s4) var(--s5); }
+
+.cards-grid { gap: var(--s3); }
+.service-card { padding: 28px 20px 24px; }
+.card-desc { min-height: 3.5em; }
+.card-medallion { margin-bottom: 2px; }
+
+/* —— 16:9 及更宽的横版：放宽栏宽、加大留白 —— */
+@media (min-aspect-ratio: 16/9) {
+  .container { width: min(1180px, 90vw); }
+  .container-wide { width: min(1380px, 92vw); }
+  .hero { min-height: min(760px, 80vh); padding: 128px 0 96px; }
+  .cards-grid { gap: 20px; }
+  .service-card { padding: 32px 22px 26px; }
+  .how { padding: 72px 44px 64px; }
+  .faq { padding: 64px 44px; }
+  .section-h2 { font-size: clamp(30px, 2.6vw, 44px); }
+  .hero-title { font-size: clamp(44px, 4.2vw, 68px); max-width: 13em; }
+}
+
+/* —— 竖版（9:16 手机为主）：收紧留白、单列排布 —— */
+@media (max-aspect-ratio: 3/4) {
+  .main { padding-top: 84px; }
+  .home > .hero { margin-top: -84px; }
+  .hero { min-height: auto; padding: 104px 0 56px; }
+  .hero-title { font-size: clamp(30px, 8.6vw, 42px); letter-spacing: 1.5px; }
+  .hero-sub { font-size: 15px; line-height: 1.95; }
+  .hero-actions { margin-top: 24px; gap: 8px; flex-wrap: nowrap; }
+  .hero-actions .btn, .hero-actions .btn-lg { padding: 12px 15px; font-size: 13.4px; letter-spacing: 0.4px; }
+  .hero-badges { margin-top: 24px; gap: 8px 16px; }
+  .hero-vertical { display: none; }
+
+  .services { margin-top: -36px; }
+  .cards-grid { grid-template-columns: 1fr; gap: var(--s2); }
+  /* 竖版：卡片改为「左图右文」，纵向高度减半 */
+  .service-card {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    gap: 14px;
+    padding: 14px 16px;
+  }
+  .card-medallion { width: 62px; height: 62px; flex: 0 0 62px; margin: 0; }
+  .medallion-icon { width: 38px; height: 38px; }
+  .card-body { flex: 1; align-items: flex-start; gap: 4px; }
+  .card-title { font-size: 17px; letter-spacing: 1px; }
+  .card-desc { font-size: 12.8px; line-height: 1.65; min-height: 0; }
+  .card-tag { display: none; }
+  .card-arrow { width: 28px; height: 28px; flex: 0 0 28px; margin: 0; }
+
+  .how { padding: 40px 18px 36px; margin-bottom: 44px; border-radius: 20px; }
+  .daily-strip { padding: 0 0 44px; }
+  .daily-inner { padding: 24px 20px; gap: 20px; }
+  .pricing { padding: 0 0 44px; }
+  .pricing-card { padding: 28px 20px; }
+  .faq { padding: 36px 18px 40px; margin-bottom: 56px; border-radius: 20px; }
+
+  .section-block, .form-card, .wuxing { padding: 20px 18px; }
+  .section-h2 { font-size: 25px; }
+  .section-sub { font-size: 14.4px; }
+  .wx-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .verdict-grid, .plan-grid, .gua-plan-row { grid-template-columns: 1fr; }
+  .quiz-birth { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .steps { gap: 20px; }
+  .legal-block { padding: 22px 18px; }
+  .footer { padding: 40px 0 32px; }
+  .footer-tagline { gap: 10px; }
 }
 
 /* 尊重"减少动态效果"偏好 */
