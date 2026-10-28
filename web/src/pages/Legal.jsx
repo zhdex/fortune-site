@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useI18n } from '../i18n/index.js';
 import { LEGAL } from '../i18n/legal.js';
-import { setConsent, hasConsent, peekPending } from '../lib/consent.js';
+import { peekPending } from '../lib/consent.js';
+import { PRODUCTS } from '../../../shared/catalog.mjs';
 
 function Doc({ doc }) {
   return (
@@ -22,21 +23,18 @@ function Doc({ doc }) {
 export default function Legal() {
   const { t, lang } = useI18n();
   const legal = LEGAL[lang] || LEGAL['zh-CN'];
-  const [status, setStatus] = useState(hasConsent() ? 'agreed' : '');
+  const refundRef = useRef(null);
+  const pending = peekPending();
 
-  const agree = () => {
-    setConsent();
-    setStatus('agreed');
-    const pending = peekPending();
-    if (pending?.from) {
-      // 回到原页面：那边的挂载钩子会读取 pending 并重新打开付款弹窗
-      window.location.hash = pending.from;
+  // 从付款弹窗跳来、且指向退款政策时，直接滚到退款政策那一段
+  useEffect(() => {
+    if (pending?.focus === 'refund' && refundRef.current) {
+      refundRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  };
+  }, []);
 
-  const disagree = () => {
-    setStatus('refused');
-    window.location.hash = '#/';
+  const backToPay = () => {
+    window.location.hash = pending?.from || '#/';
   };
 
   return (
@@ -52,21 +50,24 @@ export default function Legal() {
       <div className="glass section-block legal-block">
         <Doc doc={legal.disclaimer} />
         <div className="legal-divider" />
-        <Doc doc={legal.refund} />
-      </div>
-
-      <div className="consent-card">
-        <h3 className="consent-title">{legal.consent.title}</h3>
-        <p className="consent-lead">{legal.consent.lead}</p>
-
-        <div className="consent-actions">
-          <button className="btn btn-gold" onClick={agree}>{legal.consent.agree}</button>
-          <button className="btn btn-ghost" onClick={disagree}>{legal.consent.disagree}</button>
+        <div ref={refundRef}>
+          <Doc doc={legal.refund} />
         </div>
-
-        {status === 'agreed' && <p className="consent-status ok">{legal.consent.agreed}</p>}
-        {status === 'refused' && <p className="consent-status no">{legal.consent.refused}</p>}
       </div>
+
+      {pending?.product && PRODUCTS[pending.product] && (
+        <div className="consent-card">
+          <h3 className="consent-title">{t('legal.pendingTitle')}</h3>
+          <p className="consent-lead">
+            {t('legal.pendingNote')}
+            <br />
+            <strong>{PRODUCTS[pending.product].title}</strong> · ${Number(PRODUCTS[pending.product].price).toFixed(2)}
+          </p>
+          <div className="consent-actions">
+            <button className="btn btn-gold" onClick={backToPay}>{t('legal.returnToPay')}</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

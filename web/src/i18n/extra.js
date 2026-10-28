@@ -280,7 +280,12 @@ const en = {
 const V31 = {
   'zh-CN': {
     nav: { legal: '免责声明' },
-    legal: { updated: '最后更新' },
+    legal: {
+      updated: '最后更新',
+      pendingTitle: '这笔订单还等着你',
+      pendingNote: '你刚才准备购买：',
+      returnToPay: '返回继续支付',
+    },
     pay: {
       refundTitle: '退款政策',
       refundShort: '数字内容（占卜结果、命理分析）一经生成并交付，原则上不予退款；重复扣款、未交付、经核实的系统故障等例外情形除外。',
@@ -297,7 +302,12 @@ const V31 = {
   },
   'zh-TW': {
     nav: { legal: '免責聲明' },
-    legal: { updated: '最後更新' },
+    legal: {
+      updated: '最後更新',
+      pendingTitle: '這筆訂單還等著你',
+      pendingNote: '你剛才準備購買：',
+      returnToPay: '返回繼續支付',
+    },
     pay: {
       refundTitle: '退款政策',
       refundShort: '數位內容（占卜結果、命理分析）一經生成並交付，原則上不予退款；重複扣款、未交付、經核實的系統故障等例外情形除外。',
@@ -314,7 +324,12 @@ const V31 = {
   },
   en: {
     nav: { legal: 'Legal' },
-    legal: { updated: 'Last updated' },
+    legal: {
+      updated: 'Last updated',
+      pendingTitle: 'Your order is waiting',
+      pendingNote: 'You were about to buy:',
+      returnToPay: 'Back to payment',
+    },
     pay: {
       refundTitle: 'Refund Policy',
       refundShort: 'Digital content (readings and destiny analyses) is non-refundable once generated and delivered. Exceptions: duplicate charges, non-delivery, verified system faults, or where law requires otherwise.',

@@ -2,18 +2,19 @@ import React, { useState } from 'react';
 import { purchase } from '../lib/api.js';
 import { PRODUCTS } from '../../../shared/catalog.mjs';
 import { useI18n } from '../i18n/index.js';
-import { hasConsent, setPending } from '../lib/consent.js';
+import { setPending } from '../lib/consent.js';
 
 /**
  * 模拟支付弹窗（占位）
  * props.product 为 shared/catalog.mjs 里的商品键
- * 付款前必须勾选同意《退款政策》；点「查看完整条款」会跳到条款页，同意后自动回到本商品付款。
+ * 付款前必须勾选同意《退款政策》（免责声明为单方告知，不在此确认）；
+ * 点「查看完整条款」跳到条款页，可直接返回本笔付款。
  */
 export default function PayModal({ product, onClose, onPaid }) {
   const { t } = useI18n();
   const p = PRODUCTS[product];
   const [step, setStep] = useState('confirm');
-  const [agreed, setAgreed] = useState(hasConsent());
+  const [agreed, setAgreed] = useState(false);
 
   if (!p) return null;
 
@@ -30,7 +31,7 @@ export default function PayModal({ product, onClose, onPaid }) {
   };
 
   const openLegal = () => {
-    setPending(product, window.location.hash || '#/');
+    setPending(product, window.location.hash || '#/', 'refund');
     window.location.hash = '#/legal';
   };
 
