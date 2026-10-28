@@ -320,9 +320,9 @@ button { font-family: inherit; }
   position: absolute;
   inset: -2%;
   background-size: cover;
-  background-position: center 42%;
+  background-position: center 46%;
   background-repeat: no-repeat;
-  filter: saturate(112%) contrast(103%);
+  filter: saturate(108%) contrast(102%);
   animation: bgDrift 34s ease-in-out infinite alternate;
   will-change: transform;
 }
@@ -337,8 +337,8 @@ button { font-family: inherit; }
   inset: 0;
   background:
     radial-gradient(ellipse 55% 70% at 78% 42%, rgba(139, 108, 255, 0.10), transparent 62%),
-    linear-gradient(96deg, rgba(6, 4, 20, 0.97) 0%, rgba(6, 4, 20, 0.94) 26%, rgba(6, 4, 20, 0.74) 44%, rgba(6, 4, 20, 0.34) 62%, rgba(6, 4, 20, 0.52) 100%),
-    linear-gradient(180deg, rgba(8, 5, 26, 0.96) 0%, rgba(8, 5, 26, 0.22) 22%, rgba(8, 5, 26, 0.08) 58%, rgba(11, 7, 26, 0.99) 100%);
+    linear-gradient(96deg, rgba(6, 4, 20, 0.97) 0%, rgba(6, 4, 20, 0.92) 26%, rgba(6, 4, 20, 0.66) 44%, rgba(6, 4, 20, 0.24) 62%, rgba(6, 4, 20, 0.44) 100%),
+    linear-gradient(180deg, rgba(8, 5, 26, 0.95) 0%, rgba(8, 5, 26, 0.18) 22%, rgba(8, 5, 26, 0.05) 58%, rgba(11, 7, 26, 0.99) 100%);
 }
 
 .hero-inner {

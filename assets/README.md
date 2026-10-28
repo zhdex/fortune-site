@@ -20,9 +20,10 @@ assets/
 
 | 文件 | 原文件名 | 尺寸 | 用途 |
 |---|---|---|---|
-| `hero-bg-original.png` | `星河幻境中的秘法之门.png`（来自 `C:\Users\zhdex\Downloads`） | 1536×1024，3.05 MB，RGB | 首页整幅主视觉背景 |
+| `hero-bg-original.png` | `梦幻紫粉星空曼陀罗.png`（主上 2026-10-28 提供） | 1672×940 | **当前首页主视觉背景**（太极八卦 + 紫粉星云） |
+| `hero-bg-previous.png` | `星河幻境中的秘法之门.png`（2026-10-26 提供） | 1536×1024，3.05 MB，RGB | 上一版主视觉，已停用，仅留档对比 |
 
-**优化产物（站点实际使用）**：`web/public/images/hero-bg.webp`（459 KB）、`hero-bg.jpg`（403 KB）。
+**优化产物（站点实际使用）**：`web/public/images/hero-bg.webp`（379 KB）、`hero-bg.jpg`（376 KB）。
 用 Python + Pillow 转换，命令等价于：
 
 ```python

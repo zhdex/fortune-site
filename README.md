@@ -17,7 +17,7 @@
 │   ├── charts.mjs     # 转发 shared/charts.mjs（保持旧引用可用）
 │   └── ai.mjs         # DeepSeek 解读（JSON mode + 回退演示模板）
 ├── web/               # React + Vite 前端（星河幻境主题：深空紫 + 金色符印）
-│   ├── public/images/        # 主视觉背景（hero-bg.webp/jpg）与 ComfyUI 生成的图标/符印
+│   ├── public/images/        # 主视觉背景（hero-bg.webp/jpg，太极八卦星云）与 ComfyUI 生成的图标/符印
 │   ├── src/i18n/             # 三语词库与切换机制（简中 / 繁中 / English）
 │   ├── src/components/       # Nav / LangSwitcher / Mandala(SVG 符印) / Icons / StarField / PayModal
 │   ├── src/lib/api.js        # 自动探测后端；不可用则回退本地引擎
