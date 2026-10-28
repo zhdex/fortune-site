@@ -1,21 +1,24 @@
 import React, { useState } from 'react';
 import { purchase } from '../lib/api.js';
-import { PRODUCTS, priceText } from '../../../shared/catalog.mjs';
+import { PRODUCTS } from '../../../shared/catalog.mjs';
 import { useI18n } from '../i18n/index.js';
+import { hasConsent, setPending } from '../lib/consent.js';
 
 /**
  * 模拟支付弹窗（占位）
- * props.product 为 shared/catalog.mjs 里的商品键，例如 'chapter:love' / 'daily:year' / 'bundle:reading'
- * 确认后：后端模式签发 HMAC 令牌，静态模式写入本地演示凭证；两种模式都落到同一个凭证仓。
+ * props.product 为 shared/catalog.mjs 里的商品键
+ * 付款前必须勾选同意《退款政策》；点「查看完整条款」会跳到条款页，同意后自动回到本商品付款。
  */
 export default function PayModal({ product, onClose, onPaid }) {
   const { t } = useI18n();
   const p = PRODUCTS[product];
-  const [step, setStep] = useState('confirm'); // confirm | paying | done | error
+  const [step, setStep] = useState('confirm');
+  const [agreed, setAgreed] = useState(hasConsent());
 
   if (!p) return null;
 
   const pay = async () => {
+    if (!agreed) return;
     setStep('paying');
     try {
       await purchase(product);
@@ -26,23 +29,50 @@ export default function PayModal({ product, onClose, onPaid }) {
     }
   };
 
+  const openLegal = () => {
+    setPending(product, window.location.hash || '#/');
+    window.location.hash = '#/legal';
+  };
+
   return (
     <div className="modal-mask" onClick={onClose}>
-      <div className="modal glass-strong" onClick={(e) => e.stopPropagation()}>
+      <div className="modal glass-strong pay-modal" onClick={(e) => e.stopPropagation()}>
         {step === 'confirm' && (
           <>
             <h3>{t('pay.title')}</h3>
             <div className="pay-product">{p.title}</div>
             <div className="price"><small>$</small>{Number(p.price).toFixed(2)}</div>
-            <p className="desc">
-              {t('pay.desc')}
-              <br />
-              {t('pay.demo')}
-            </p>
+
+            <div className="refund-box">
+              <div className="refund-head">
+                <span className="refund-title">📄 {t('pay.refundTitle')}</span>
+                <button type="button" className="refund-link" onClick={openLegal}>{t('pay.viewFull')}</button>
+              </div>
+              <p className="refund-text">{t('pay.refundShort')}</p>
+            </div>
+
+            <label className={`agree-row ${agreed ? 'is-on' : ''}`}>
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+              />
+              <span className="agree-text">
+                {t('pay.agreePrefix')}
+                <button type="button" className="agree-link" onClick={openLegal}>{t('pay.refundLink')}</button>
+                {t('pay.agreeTail')}
+              </span>
+            </label>
+
             <div className="actions">
-              <button className="btn btn-gold" onClick={pay}>{t('pay.confirm')}</button>
+              <button className="btn btn-gold" disabled={!agreed} onClick={pay}>
+                {t('pay.confirm')}
+              </button>
+              {!agreed && <p className="agree-hint">{t('pay.needAgree')}</p>}
               <button className="btn btn-ghost btn-sm" onClick={onClose}>{t('pay.cancel')}</button>
             </div>
+
+            <p className="pay-demo">{t('pay.demo')}</p>
           </>
         )}
 

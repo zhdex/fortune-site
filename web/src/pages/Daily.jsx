@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../lib/api.js';
 import PayModal from '../components/PayModal.jsx';
 import { DAILY_PRODUCTS, PRODUCTS } from '../../../shared/catalog.mjs';
+import { takePending } from '../lib/consent.js';
+import { saveDraft, loadDraft } from '../lib/draft.js';
 import { useI18n } from '../i18n/index.js';
 
 const today = () => {
@@ -70,11 +72,12 @@ export default function Daily() {
   const [loading, setLoading] = useState(false);
   const [paying, setPaying] = useState(null);
 
-  const run = async (nextDate = date) => {
+  const run = async (nextDate = date, nextBirth = birth) => {
     setLoading(true);
     try {
-      const r = await api.dailyQuiz({ birth, date: nextDate });
+      const r = await api.dailyQuiz({ birth: nextBirth, date: nextDate });
       setResult(r);
+      saveDraft('daily', { birth: nextBirth, date: nextDate });
     } catch {
       setResult(null);
     } finally {
@@ -82,7 +85,19 @@ export default function Daily() {
     }
   };
 
-  useEffect(() => { run(today()); }, []);
+  // 首次加载：恢复草稿（若有）并重开待付款订单
+  useEffect(() => {
+    const draft = loadDraft('daily');
+    if (draft?.birth) {
+      setBirth(draft.birth);
+      setDate(draft.date);
+      run(draft.date, draft.birth);
+    } else {
+      run(today());
+    }
+    const p = takePending();
+    if (p?.product) setPaying(p.product);
+  }, []);
 
   const set = (k) => (e) => setBirth((b) => ({ ...b, [k]: Number(e.target.value) }));
   const free = result && !result.entitled ? result.free : null;

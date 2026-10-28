@@ -3,6 +3,8 @@ import { streamInterpret, ensureMode, onModeChange, getEntitlements } from '../l
 import PayModal from '../components/PayModal.jsx';
 import WuxingEnergy from '../components/WuxingEnergy.jsx';
 import { PRODUCTS, readingPrices, scopeCovers } from '../../../shared/catalog.mjs';
+import { takePending } from '../lib/consent.js';
+import { saveDraft, loadDraft } from '../lib/draft.js';
 import { useI18n } from '../i18n/index.js';
 
 const YEARS = Array.from({ length: 101 }, (_, i) => 2026 - i);
@@ -131,6 +133,14 @@ export default function Fortune() {
     return off;
   }, []);
 
+  // 从条款页同意返回后：恢复上次的出生信息、自动重开付款并重新排盘
+  useEffect(() => {
+    const draft = loadDraft('fortune');
+    const p = takePending();
+    if (p?.product) setPaying(p.product);
+    if (draft) start(draft);
+  }, []);
+
   useEffect(() => () => abortRef.current?.(), []);
 
   const start = (payload) => {
@@ -153,6 +163,7 @@ export default function Fortune() {
     setChapterLock(null);
     setDone(false);
     lastInputRef.current = { mode: m || 'bazi', ...input };
+    saveDraft('fortune', { mode: m || 'bazi', ...input });
 
     abortRef.current?.();
     abortRef.current = streamInterpret({

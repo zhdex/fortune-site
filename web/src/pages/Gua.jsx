@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { api } from '../lib/api.js';
 import PayModal from '../components/PayModal.jsx';
-import { PRODUCTS } from '../../../shared/catalog.mjs';
+import { PRODUCTS, GUA_PRODUCTS } from '../../../shared/catalog.mjs';
+import { takePending } from '../lib/consent.js';
+import { saveDraft, loadDraft } from '../lib/draft.js';
 import { useI18n } from '../i18n/index.js';
 
 const CATEGORIES = ['career', 'wealth', 'love', 'health', 'study', 'other'];
@@ -35,16 +37,31 @@ export default function Gua() {
   const [category, setCategory] = useState('career');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [paying, setPaying] = useState(false);
+  const [paying, setPaying] = useState(null);
   const [error, setError] = useState('');
 
-  const cast = async () => {
-    if (!question.trim()) { setError(t('gua.empty')); return; }
+  // 从条款页同意返回后：恢复草稿、自动重开付款并重新起卦
+  useEffect(() => {
+    const draft = loadDraft('gua');
+    if (draft) {
+      setQuestion(draft.question || '');
+      setCategory(draft.category || 'career');
+    }
+    const p = takePending();
+    if (p?.product) {
+      setPaying(p.product);
+      if (draft?.question) cast(draft.question, draft.category);
+    }
+  }, []);
+
+  const cast = async (q = question, cat = category) => {
+    if (!q.trim()) { setError(t('gua.empty')); return; }
     setError('');
     setLoading(true);
     try {
-      const r = await api.gua({ question: question.trim(), category, hour: new Date().getHours() });
+      const r = await api.gua({ question: q.trim(), category: cat, hour: new Date().getHours() });
       setResult(r);
+      saveDraft('gua', { question: q, category: cat });
     } catch (e) {
       setError(e.message || '起卦失败');
     } finally {
@@ -52,7 +69,7 @@ export default function Gua() {
     }
   };
 
-  const afterPay = () => { setPaying(false); cast(); };
+  const afterPay = () => { setPaying(null); cast(); };
 
   return (
     <div className="gua-page container">
@@ -89,7 +106,7 @@ export default function Gua() {
           ))}
         </div>
         <div style={{ textAlign: 'center', marginTop: 20 }}>
-          <button className="btn btn-gold btn-lg" disabled={loading} onClick={cast}>
+          <button className="btn btn-gold btn-lg" disabled={loading} onClick={() => cast()}>
             {loading ? t('gua.casting') : `✦ ${t('gua.cast')}`}
           </button>
         </div>
@@ -141,21 +158,34 @@ export default function Gua() {
           )}
 
           {!result.entitled && (
-            <div className="glass-strong bundle-card">
+            <div className="glass-strong bundle-card gua-plans">
               <div className="bundle-info">
                 <h4>{t('gua.locked')}</h4>
                 <p>{t('gua.lockedSub')}</p>
               </div>
-              <button className="btn btn-gold" onClick={() => setPaying(true)}>
-                {t('gua.unlock')} ${Number(PRODUCTS['gua:single'].price).toFixed(2)}
-              </button>
+              <div className="gua-plan-row">
+                {GUA_PRODUCTS.map((key) => {
+                  const prod = PRODUCTS[key];
+                  return (
+                    <button
+                      key={key}
+                      className={`gua-plan ${prod.highlight ? 'is-highlight' : ''}`}
+                      onClick={() => setPaying(key)}
+                    >
+                      <span className="gua-plan-name">{t(`gua.plan.${key.split(':')[1]}`)}</span>
+                      <span className="gua-plan-price">${Number(prod.price).toFixed(2)}</span>
+                      <span className="gua-plan-note">{t(`gua.planNote.${key.split(':')[1]}`)}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
       )}
 
       {paying && (
-        <PayModal product="gua:single" onClose={() => setPaying(false)} onPaid={afterPay} />
+        <PayModal product={paying} onClose={() => setPaying(null)} onPaid={afterPay} />
       )}
     </div>
   );

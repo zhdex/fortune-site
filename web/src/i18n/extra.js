@@ -275,4 +275,72 @@ const en = {
   },
 };
 
-export const EXTRA = { 'zh-CN': zhCN, 'zh-TW': zhTW, en };
+/* ---------- v3.1：条款页 / 付款前勾选 / 一卦三档 ---------- */
+
+const V31 = {
+  'zh-CN': {
+    nav: { legal: '免责声明' },
+    legal: { updated: '最后更新' },
+    pay: {
+      refundTitle: '退款政策',
+      refundShort: '数字内容（占卜结果、命理分析）一经生成并交付，原则上不予退款；重复扣款、未交付、经核实的系统故障等例外情形除外。',
+      viewFull: '查看完整条款 ›',
+      agreePrefix: '我已阅读并同意',
+      refundLink: '《退款政策》',
+      agreeTail: '。我理解，本网站的数字占卜结果生成并提供后，原则上不予退款，但适用法律另有规定或符合政策例外情况的除外。',
+      needAgree: '请先勾选同意退款政策，再完成付款',
+    },
+    gua: {
+      plan: { single: '单次', month: '包月', year: '包年' },
+      planNote: { single: '今天这一卦', month: '一个月随便问', year: '一年随便问，最划算' },
+    },
+  },
+  'zh-TW': {
+    nav: { legal: '免責聲明' },
+    legal: { updated: '最後更新' },
+    pay: {
+      refundTitle: '退款政策',
+      refundShort: '數位內容（占卜結果、命理分析）一經生成並交付，原則上不予退款；重複扣款、未交付、經核實的系統故障等例外情形除外。',
+      viewFull: '查看完整條款 ›',
+      agreePrefix: '我已閱讀並同意',
+      refundLink: '《退款政策》',
+      agreeTail: '。我理解，本網站的數位占卜結果生成並提供後，原則上不予退款，但適用法律另有規定或符合政策例外情況的除外。',
+      needAgree: '請先勾選同意退款政策，再完成付款',
+    },
+    gua: {
+      plan: { single: '單次', month: '包月', year: '包年' },
+      planNote: { single: '今天這一卦', month: '一個月隨便問', year: '一年隨便問，最划算' },
+    },
+  },
+  en: {
+    nav: { legal: 'Legal' },
+    legal: { updated: 'Last updated' },
+    pay: {
+      refundTitle: 'Refund Policy',
+      refundShort: 'Digital content (readings and destiny analyses) is non-refundable once generated and delivered. Exceptions: duplicate charges, non-delivery, verified system faults, or where law requires otherwise.',
+      viewFull: 'Read the full policy ›',
+      agreePrefix: 'I have read and agree to the',
+      refundLink: 'Refund Policy',
+      agreeTail: '. I understand that once the digital divination result has been generated and delivered, refunds are in principle not available, except where applicable law provides otherwise or a policy exception applies.',
+      needAgree: 'Please tick the refund policy box before paying',
+    },
+    gua: {
+      plan: { single: 'Single', month: 'Monthly', year: 'Yearly' },
+      planNote: { single: 'Today’s reading', month: 'Ask freely for a month', year: 'A whole year, best value' },
+    },
+  },
+};
+
+function deepMerge(base = {}, patch = {}) {
+  const out = { ...base };
+  for (const [k, v] of Object.entries(patch)) {
+    out[k] = v && typeof v === 'object' && !Array.isArray(v) ? deepMerge(base[k] || {}, v) : v;
+  }
+  return out;
+}
+
+export const EXTRA = {
+  'zh-CN': deepMerge(zhCN, V31['zh-CN']),
+  'zh-TW': deepMerge(zhTW, V31['zh-TW']),
+  en: deepMerge(en, V31.en),
+};

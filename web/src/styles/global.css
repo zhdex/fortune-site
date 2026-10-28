@@ -1714,6 +1714,237 @@ button { font-family: inherit; }
   .bundle-card { flex-direction: column; align-items: flex-start; }
 }
 
+/* ============================================================
+   v3.1：字号整体放大 / 条款页 / 付款勾选 / 一卦三档
+   ============================================================ */
+
+/* ---------------- 字号整体上调约 10% ---------------- */
+.nav-link { font-size: 15.5px; }
+.logo-text strong { font-size: 22px; }
+.logo-text small { font-size: 9px; letter-spacing: 3.4px; }
+.lang-trigger { font-size: 13.6px; }
+.lang-item { font-size: 14.2px; }
+.btn { font-size: 15.6px; }
+.btn-lg { font-size: 16.2px; }
+.btn-sm { font-size: 14.2px; }
+.btn-nav { font-size: 14.2px; }
+.eyebrow { font-size: 12.4px; }
+.hero-sub { font-size: clamp(15.4px, 1.15vw, 17.4px); }
+.hero-badges { font-size: 13.4px; }
+.kicker { font-size: 11.4px; }
+.section-h2 { font-size: clamp(28px, 3.3vw, 42px); }
+.section-sub { font-size: 15.6px; }
+.card-title { font-size: 21.4px; }
+.card-desc { font-size: 14.2px; }
+.card-tag { font-size: 11.4px; }
+.step h4 { font-size: 17.4px; }
+.step p { font-size: 14.5px; }
+.step-num { font-size: 32px; }
+.prose { font-size: 16.2px; }
+.section-title { font-size: 22px; }
+.field label { font-size: 13px; }
+.field select, .field input { font-size: 15.4px; }
+.chip { font-size: 13.4px; }
+.page-sub { font-size: 15.6px; }
+.value-card p { font-size: 14.5px; }
+.value-card h4 { font-size: 17px; }
+.disclaimer { font-size: 12.9px; }
+.footer-disclaimer { font-size: 12.9px; }
+.footer-meta { font-size: 12.4px; }
+.tagline-text { font-size: 11.4px; }
+.footer-brand { font-size: 15.8px; }
+.wx-sub { font-size: 13.4px; }
+.wx-cn { font-size: 18px; }
+.wx-en { font-size: 11.6px; }
+.wx-keyword { font-size: 11.2px; }
+.wx-count { font-size: 10.8px; }
+.wx-advice { font-size: 15px; }
+.wx-note { font-size: 12.9px; }
+.lock-text { font-size: 13.6px; }
+.bundle-info h4 { font-size: 19px; }
+.bundle-info p { font-size: 13.6px; }
+.premium-title { font-size: 17px; }
+.quiz-type-row { font-size: 13.4px; }
+.quiz-type-val { font-size: 16px; }
+.color-meta b { font-size: 13.4px; }
+.color-meta small { font-size: 10.4px; }
+.score-label { font-size: 11px; }
+.quiz-headline { font-size: 21.4px; }
+.quiz-tip { font-size: 14.6px; }
+.verdict-name { font-size: 14.2px; }
+.verdict-tag { font-size: 11.6px; }
+.tips-list li { font-size: 14.7px; }
+.week-row { font-size: 13.4px; }
+.plan-name { font-size: 13.4px; }
+.plan-note { font-size: 11.4px; }
+.plan-price { font-size: 30px; }
+.gua-label { font-size: 13px; }
+.gua-input { font-size: 15.4px; }
+.cat-chip { font-size: 13.4px; }
+.gua-level { font-size: 27px; }
+.gua-judgement { font-size: 15.6px; }
+.gua-lines li { font-size: 15.2px; }
+.gua-mini-text { font-size: 13.4px; }
+.gua-lines li { line-height: 2.1; }
+.quiz-points { font-size: 14.4px; }
+.modal .desc { font-size: 14px; }
+.typing-hint { font-size: 13.8px; }
+.static-note { font-size: 13.6px; }
+
+/* ---------------- 条款页 ---------------- */
+.legal-page { max-width: 920px; }
+
+.legal-block { padding: 34px 40px; }
+
+.legal-h2 {
+  font-family: var(--serif);
+  font-size: 27px;
+  letter-spacing: 2px;
+  color: var(--gold-hi);
+  margin-bottom: 16px;
+}
+
+.legal-h3 {
+  font-size: 16.4px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: var(--gold);
+  margin: 24px 0 8px;
+}
+
+.legal-p {
+  font-size: 14.8px;
+  line-height: 2.1;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.legal-intro { color: rgba(232, 225, 250, 0.94); }
+
+.legal-note {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(230, 198, 139, 0.07);
+  border: 1px solid rgba(230, 198, 139, 0.22);
+  color: var(--gold-hi);
+  font-size: 13.8px;
+  line-height: 1.95;
+}
+
+.legal-divider {
+  height: 1px;
+  margin: 36px 0;
+  background: linear-gradient(90deg, transparent, rgba(230, 198, 139, 0.32), transparent);
+}
+
+.consent-card {
+  margin-top: 22px;
+  padding: 30px 32px;
+  border-radius: 18px;
+  text-align: center;
+  border: 1px solid rgba(230, 198, 139, 0.3);
+  background: linear-gradient(120deg, rgba(230, 198, 139, 0.08), rgba(139, 108, 255, 0.07));
+}
+.consent-title { font-family: var(--serif); font-size: 23px; letter-spacing: 2px; color: var(--gold-hi); }
+.consent-lead { max-width: 660px; margin: 12px auto 24px; font-size: 14.4px; line-height: 2; color: var(--muted); }
+.consent-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.consent-status { margin-top: 16px; font-size: 13.8px; }
+.consent-status.ok { color: #9fe8c6; }
+.consent-status.no { color: #ffb3ba; }
+
+/* ---------------- 付款弹窗：退款勾选 ---------------- */
+.pay-modal { width: min(540px, 94vw); }
+
+.refund-box {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line-soft);
+}
+
+.refund-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.refund-title { font-size: 12.8px; letter-spacing: 1px; color: var(--gold-hi); }
+.refund-link {
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 11.8px;
+  color: var(--lilac);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.refund-link:hover { color: var(--gold-hi); text-decoration: underline; }
+.refund-text { font-size: 12.4px; line-height: 1.85; color: var(--dim); }
+
+.agree-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  text-align: left;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--line-soft);
+  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.agree-row.is-on { border-color: rgba(230, 198, 139, 0.45); background: rgba(230, 198, 139, 0.06); }
+.agree-row input {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  margin-top: 3px;
+  accent-color: #e6c68b;
+  cursor: pointer;
+}
+.agree-text { font-size: 12.6px; line-height: 1.85; color: var(--muted); }
+.agree-link {
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: inherit;
+  color: var(--gold);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.agree-hint { margin-top: 8px; font-size: 11.8px; text-align: center; color: #ffb3ba; }
+.pay-demo { margin-top: 12px; font-size: 11.4px; color: var(--dim); }
+
+/* ---------------- 一卦三档 ---------------- */
+.gua-plans { flex-direction: column; align-items: stretch; }
+.gua-plan-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+.gua-plan {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--line-soft);
+  transition: transform var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.gua-plan:hover { transform: translateY(-2px); border-color: rgba(230, 198, 139, 0.4); }
+.gua-plan.is-highlight {
+  border-color: rgba(230, 198, 139, 0.5);
+  background: linear-gradient(170deg, rgba(230, 198, 139, 0.12), rgba(139, 108, 255, 0.06));
+}
+.gua-plan-name { font-size: 12.8px; letter-spacing: 1px; color: var(--muted); }
+.gua-plan-price { font-family: var(--serif); font-size: 25px; color: var(--gold-hi); }
+.gua-plan-note { font-size: 10.8px; text-align: center; color: var(--dim); }
+
+@media (max-width: 560px) {
+  .legal-block { padding: 22px 18px; }
+  .legal-h2 { font-size: 23px; }
+  .consent-card { padding: 22px 18px; }
+  .gua-plan-row { grid-template-columns: 1fr; }
+}
+
 /* 尊重"减少动态效果"偏好 */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

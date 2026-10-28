@@ -5,6 +5,7 @@ import Home from './pages/Home.jsx';
 import Fortune from './pages/Fortune.jsx';
 import Daily from './pages/Daily.jsx';
 import Gua from './pages/Gua.jsx';
+import Legal from './pages/Legal.jsx';
 import About from './pages/About.jsx';
 import { I18nProvider, useI18n } from './i18n/index.js';
 
@@ -13,6 +14,7 @@ const ROUTES = [
   { hash: '#/fortune', key: 'nav.reading', comp: Fortune },
   { hash: '#/daily', key: 'nav.daily', comp: Daily },
   { hash: '#/gua', key: 'nav.gua', comp: Gua },
+  { hash: '#/legal', key: 'nav.legal', comp: Legal },
   { hash: '#/about', key: 'nav.about', comp: About },
 ];
 
@@ -106,6 +108,8 @@ function Footer() {
         <p className="footer-disclaimer">{t('footer.disclaimer')}</p>
         <div className="footer-meta">
           <span>© 2026 星阑文化 / Xinglan Culture</span>
+          <span className="dot-sep">·</span>
+          <button className="link-quiet" onClick={() => (window.location.hash = '#/legal')}>{t('nav.legal')}</button>
           <span className="dot-sep">·</span>
           <button className="link-quiet" onClick={() => (window.location.hash = '#/about')}>{t('nav.about')}</button>
           <span className="dot-sep">·</span>

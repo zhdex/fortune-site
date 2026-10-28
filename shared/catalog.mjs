@@ -74,16 +74,35 @@ export const PRODUCTS = {
 
   /* —— 一日一卦 —— */
   'gua:single': {
-    title: '一日一卦 · 深度解读',
-    titleEn: 'One Gua · Deep reading',
+    title: '一日一卦 · 单次深度解读',
+    titleEn: 'One Gua · single reading',
     price: 1.99,
     scope: ['gua'],
     group: 'gua',
+    ttl: 24 * 60 * 60 * 1000,
+  },
+  'gua:month': {
+    title: '一日一卦 · 包月',
+    titleEn: 'One Gua · monthly',
+    price: 19.99,
+    scope: ['gua'],
+    group: 'gua',
+    ttl: 31 * 24 * 60 * 60 * 1000,
+  },
+  'gua:year': {
+    title: '一日一卦 · 包年',
+    titleEn: 'One Gua · yearly',
+    price: 39.99,
+    scope: ['gua'],
+    group: 'gua',
+    ttl: 365 * 24 * 60 * 60 * 1000,
+    highlight: true,
   },
 };
 
 export const READING_PRODUCTS = ['chapter:summary', 'chapter:love', 'chapter:career', 'bundle:reading'];
 export const DAILY_PRODUCTS = ['daily:day', 'daily:month', 'daily:half', 'daily:year'];
+export const GUA_PRODUCTS = ['gua:single', 'gua:month', 'gua:year'];
 
 /** 单个章节 → 对应的 scope */
 export const SECTION_SCOPE = { summary: 'ch:summary', love: 'ch:love', career: 'ch:career' };
