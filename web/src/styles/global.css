@@ -2118,6 +2118,76 @@ button { font-family: inherit; }
   .footer-tagline { gap: 10px; }
 }
 
+/* ============================================================
+   v3.4 排版加固：标题加粗、正文字号上调、命盘页专属排版
+   ============================================================ */
+
+/* 每页大标题统一加粗（原来是 500，显得飘） */
+.page-title {
+  font-weight: 700;
+  font-size: clamp(32px, 4.2vw, 50px);
+  letter-spacing: 2px;
+}
+.hero-title { font-weight: 700; }
+.section-h2 { font-weight: 600; }
+.section-title { font-weight: 700; font-size: 23px; }
+.legal-h2 { font-weight: 700; }
+.headline { font-weight: 600; font-size: clamp(21px, 2.8vw, 31px); }
+
+/* 正文字号再上一档 */
+.prose { font-size: 17.2px; line-height: 2.15; }
+.legal-p { font-size: 16px; line-height: 2.15; }
+.card-desc { font-size: 15px; }
+.section-sub { font-size: 16px; }
+.daily-fallback, .typing-hint { font-size: 14.6px; }
+.chip { font-size: 14px; }
+
+/* 命盘解读页：正文更大、行距更松、段落留白更足 */
+.fortune-page .prose { font-size: 17.6px; line-height: 2.2; letter-spacing: 0.3px; }
+.fortune-page .section-block { padding: 28px 34px; }
+.fortune-page .section-title { font-size: 24px; }
+.fortune-page .wx-advice { font-size: 16.4px; line-height: 2.15; }
+.fortune-page .chip { font-size: 14.2px; }
+.fortune-page .headline { font-size: clamp(22px, 3vw, 32px); }
+.fortune-page .premium-card .prose { font-size: 17.2px; }
+
+/* 「能看什么 / 怎么读」说明块 */
+.fortune-note { padding: 28px 34px; }
+.fortune-note h3 {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  color: var(--gold-hi);
+  margin-bottom: 8px;
+}
+.fortune-note .lead {
+  font-size: 15.4px;
+  line-height: 1.95;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+.fortune-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.fortune-list li {
+  display: flex;
+  gap: 12px;
+  font-size: 16px;
+  line-height: 2;
+  color: rgba(224, 215, 246, 0.94);
+}
+.fortune-list .mark {
+  flex: 0 0 22px;
+  height: 22px;
+  margin-top: 5px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  color: #2c1f08;
+  background: linear-gradient(120deg, #f4dcaa, var(--gold));
+}
+.fortune-list b { color: var(--gold-hi); font-weight: 600; }
+
 /* 尊重"减少动态效果"偏好 */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

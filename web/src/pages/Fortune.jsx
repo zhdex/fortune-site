@@ -207,6 +207,19 @@ export default function Fortune() {
         <p className="page-sub">{t('fortune.sub')}</p>
       </header>
 
+      <section className="glass section-block fortune-note">
+        <h3>{t('fortune.introTitle')}</h3>
+        <p className="lead">{t('fortune.introLead')}</p>
+        <ul className="fortune-list">
+          {['i1', 'i2', 'i3'].map((k, i) => (
+            <li key={k}>
+              <span className="mark">{i + 1}</span>
+              <span><b>{t(`fortune.${k}t`)}</b>：{t(`fortune.${k}d`)}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       {engine === 'static' && <div className="glass static-note">✦ {t('fortune.staticTip')}</div>}
 
       <BirthForm onSubmit={start} loading={loading} />
@@ -233,6 +246,18 @@ export default function Fortune() {
           </div>
 
           {SECTIONS.map((k) => (sections[k] ? <SectionCard key={k} data={sections[k]} onUnlock={setPaying} /> : null))}
+
+          <section className="glass section-block fortune-note">
+            <h3>{t('fortune.howTitle')}</h3>
+            <ul className="fortune-list">
+              {['h1', 'h2', 'h3'].map((k, i) => (
+                <li key={k}>
+                  <span className="mark">{i + 1}</span>
+                  <span>{t(`fortune.${k}`)}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
 
           {anyLocked && !bundleOwned && (
             <div className="bundle-card glass-strong">
