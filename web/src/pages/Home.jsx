@@ -60,7 +60,7 @@ function CardMedallion({ k }) {
   const file = k === 'gua' ? 'gua-taiji' : `icon-${k}`;
   return (
     <span className="medallion-icon">
-      {broken || !Icon
+      {broken
         ? <span className="medallion-fallback">☯</span>
         : (
           <img
