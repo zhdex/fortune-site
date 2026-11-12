@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Mandala from '../components/Mandala.jsx';
 import { CARD_ICONS } from '../components/Icons.jsx';
 import { useI18n } from '../i18n/index.js';
 import { api } from '../lib/api.js';
@@ -75,7 +74,7 @@ function CardMedallion({ k }) {
   );
 }
 
-const CARD_LINK = { fortune: '#/daily', gua: '#/gua' };
+const CARD_LINK = { fortune: '#/daily', love: '#/match', career: '#/career', gua: '#/gua' };
 
 function ServiceCards() {
   const { t } = useI18n();
@@ -185,38 +184,59 @@ function DailyStrip() {
   );
 }
 
-function Pricing() {
+function Trust() {
   const { t } = useI18n();
   return (
-    <section className="pricing container">
-      <div className="pricing-card glass-strong">
-        <div className="pricing-art" aria-hidden="true"><Mandala size={360} /></div>
-        <div className="pricing-copy">
-          <span className="kicker">REPORT</span>
-          <h2 className="section-h2">{t('pricing.title')}</h2>
-          <p className="section-sub">{t('pricing.sub')}</p>
-          <ul className="feature-list">
-            {['f1', 'f2', 'f3', 'f4', 'f5', 'f6'].map((f) => (
-              <li key={f}>
-                <span className="check">✓</span>
-                {t(`pricing.${f}`)}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="pricing-buy">
-          <div className="price-tag">
-            <span className="currency">¥</span>
-            <span className="amount">{t('pricing.price')}</span>
+    <section className="trust container">
+      <header className="section-head">
+        <span className="kicker">{t('trust.kicker')}</span>
+        <h2 className="section-h2">{t('trust.title')}</h2>
+        <p className="section-sub">{t('trust.lead')}</p>
+      </header>
+      <div className="trust-grid">
+        {['r1', 'r2', 'r3', 'r4', 'r5', 'r6'].map((k) => (
+          <div key={k} className="trust-item">
+            <h4>{t(`trust.${k}t`)}</h4>
+            <p>{t(`trust.${k}d`)}</p>
           </div>
-          <div className="price-unit">{t('pricing.unit')}</div>
-          <button className="btn btn-gold btn-lg btn-block" onClick={() => { window.location.hash = '#/fortune'; }}>
-            {t('pricing.cta')}
-          </button>
-          <p className="price-note">{t('pricing.note')}</p>
-        </div>
+        ))}
       </div>
+    </section>
+  );
+}
+
+function Ladder() {
+  const { t } = useI18n();
+  const lines = [
+    { key: 'p1', to: '#/fortune' },
+    { key: 'p2', to: '#/match' },
+    { key: 'p3', to: '#/career' },
+    { key: 'p4', to: '#/gua' },
+  ];
+  return (
+    <section className="pricing container">
+      <header className="section-head">
+        <span className="kicker">PRICING</span>
+        <h2 className="section-h2">{t('ladder.title')}</h2>
+        <p className="section-sub">{t('ladder.sub')}</p>
+      </header>
+      <div className="ladder-grid">
+        {lines.map((l) => (
+          <button
+            key={l.key}
+            className="ladder-card"
+            onClick={() => { window.location.hash = l.to; }}
+          >
+            <h4>{t(`ladder.${l.key}`)}</h4>
+            <ul>
+              <li>{t(`ladder.${l.key}a`)}</li>
+              <li>{t(`ladder.${l.key}b`)}</li>
+              <li>{t(`ladder.${l.key}c`)}</li>
+            </ul>
+          </button>
+        ))}
+      </div>
+      <p className="ladder-all">{t('ladder.all')}</p>
     </section>
   );
 }
@@ -251,7 +271,8 @@ export default function Home() {
       <ServiceCards />
       <HowItWorks />
       <DailyStrip />
-      <Pricing />
+      <Trust />
+      <Ladder />
       <Faq />
     </div>
   );

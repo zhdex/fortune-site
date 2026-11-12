@@ -2188,6 +2188,83 @@ button { font-family: inherit; }
 }
 .fortune-list b { color: var(--gold-hi); font-weight: 600; }
 
+/* ============================================================
+   v4：合盘 / 学业事业 / 付费理由 / 定价阶梯
+   ============================================================ */
+
+/* 双人合盘 */
+.pair-forms { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.pair-card { padding: 18px 18px 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line-soft); }
+.pair-head { font-family: var(--serif); font-size: 16px; letter-spacing: 1.5px; color: var(--gold-hi); margin-bottom: 12px; }
+.pair-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.pair-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.score-hero { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
+.score-copy { flex: 1; min-width: 240px; }
+
+.evidence-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.evidence-list li { position: relative; padding-left: 18px; font-size: 15px; line-height: 1.95; color: var(--muted); }
+.evidence-list li::before { content: '◆'; position: absolute; left: 2px; top: 6px; font-size: 8px; color: rgba(230, 198, 139, 0.7); }
+.evidence-list.warn li { color: rgba(255, 196, 205, 0.94); }
+.evidence-list.warn li::before { color: rgba(255, 154, 165, 0.8); }
+.locked-line { margin-top: 14px; font-size: 13.5px; color: var(--gold); }
+
+/* 学业事业 */
+.strength-list { display: grid; gap: 12px; }
+.strength-item { padding: 16px 18px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line-soft); }
+.strength-item h4 { font-size: 16px; letter-spacing: 0.6px; color: var(--gold-hi); margin-bottom: 6px; }
+.strength-item p { font-size: 15px; line-height: 1.95; color: var(--muted); }
+.evidence-tag { display: inline-block; margin-top: 10px; padding-left: 8px; font-size: 12px; color: var(--dim); border-left: 2px solid rgba(230, 198, 139, 0.4); }
+
+.job-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.job-tag { padding: 8px 16px; border-radius: 999px; font-size: 14px; color: var(--gold-hi); background: rgba(230, 198, 139, 0.1); border: 1px solid rgba(230, 198, 139, 0.28); }
+
+.stage-list { display: flex; flex-direction: column; gap: 12px; }
+.stage-row {
+  display: grid;
+  grid-template-columns: 190px 190px 1fr;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line-soft);
+  font-size: 14.5px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.stage-range { color: var(--gold-hi); }
+.stage-theme { color: var(--text); }
+
+.plan-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* 付费理由 */
+.trust-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.trust-item { padding: 20px 20px 22px; border-radius: 16px; background: rgba(16, 10, 36, 0.68); border: 1px solid var(--line-soft); }
+.trust-item h4 { font-size: 16.5px; letter-spacing: 0.4px; color: var(--gold-hi); margin-bottom: 8px; }
+.trust-item p { font-size: 14.4px; line-height: 1.95; color: var(--muted); }
+
+/* 定价阶梯 */
+.ladder-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.ladder-card { padding: 22px 20px; border-radius: 16px; background: rgba(16, 10, 36, 0.72); border: 1px solid var(--line-soft); }
+.ladder-card h4 { font-family: var(--serif); font-size: 19px; letter-spacing: 1px; color: var(--gold-hi); margin-bottom: 12px; }
+.ladder-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--muted); }
+.ladder-card li::before { content: '·'; color: var(--gold); margin-right: 6px; }
+.ladder-all { margin-top: 20px; text-align: center; font-size: 14.6px; color: var(--gold); letter-spacing: 0.5px; }
+
+@media (max-width: 1180px) {
+  .trust-grid, .ladder-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pair-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stage-row { grid-template-columns: 1fr 1fr; }
+  .stage-advice { grid-column: 1 / -1; }
+}
+
+@media (max-aspect-ratio: 3/4) {
+  .pair-forms { grid-template-columns: 1fr; }
+  .trust-grid, .ladder-grid, .plan-grid.three { grid-template-columns: 1fr; }
+  .pair-grid { grid-template-columns: 1fr 1fr; }
+  .stage-row { grid-template-columns: 1fr; gap: 4px; }
+}
+
 /* 尊重"减少动态效果"偏好 */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

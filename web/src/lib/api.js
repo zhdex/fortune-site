@@ -4,7 +4,7 @@
  * 两种模式对外接口完全一致，页面代码无需分叉。
  */
 import { PRODUCTS, scopeCovers } from '../../../shared/catalog.mjs';
-import { localBazi, localZiwei, localDaily, localQuiz, localGua, localStream } from './localEngine.js';
+import { localBazi, localZiwei, localDaily, localQuiz, localGua, localMatch, localCareer, localStream } from './localEngine.js';
 
 const API_BASE = 'api';
 
@@ -145,6 +145,16 @@ export const api = {
   gua: async ({ question, category, date, hour }) => {
     if (await detect()) return post('/gua', { question, category, date, hour, tokens: getTokens() });
     return localGua({ question, category, date, hour, entitlements: getEntitlements() });
+  },
+
+  match: async ({ a, b }) => {
+    if (await detect()) return post('/match', { a, b, tokens: getTokens() });
+    return localMatch({ a, b, entitlements: getEntitlements() });
+  },
+
+  career: async ({ input }) => {
+    if (await detect()) return post('/career', { input, tokens: getTokens() });
+    return localCareer({ input, entitlements: getEntitlements() });
   },
 };
 

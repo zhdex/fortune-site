@@ -3,6 +3,8 @@ import StarField from './components/StarField.jsx';
 import LangSwitcher from './components/LangSwitcher.jsx';
 import Home from './pages/Home.jsx';
 import Fortune from './pages/Fortune.jsx';
+import Match from './pages/Match.jsx';
+import Career from './pages/Career.jsx';
 import Daily from './pages/Daily.jsx';
 import Gua from './pages/Gua.jsx';
 import Legal from './pages/Legal.jsx';
@@ -12,6 +14,8 @@ import { I18nProvider, useI18n } from './i18n/index.js';
 const ROUTES = [
   { hash: '#/', key: 'nav.home', comp: Home },
   { hash: '#/fortune', key: 'nav.reading', comp: Fortune },
+  { hash: '#/match', key: 'nav.match', comp: Match },
+  { hash: '#/career', key: 'nav.career', comp: Career },
   { hash: '#/daily', key: 'nav.daily', comp: Daily },
   { hash: '#/gua', key: 'nav.gua', comp: Gua },
   { hash: '#/legal', key: 'nav.legal', comp: Legal },

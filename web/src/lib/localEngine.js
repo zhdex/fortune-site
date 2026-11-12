@@ -7,7 +7,9 @@ import { computeBazi, computeZiwei, computeDaily } from '../../../shared/charts.
 import { mockInterpret, mockDailyText } from '../../../shared/interpret.mjs';
 import { computeDailyQuiz, computeWeek } from '../../../shared/dailyQuiz.mjs';
 import { castGua, guaHeadline, GUA_CATEGORIES } from '../../../shared/divination.mjs';
-import { PRODUCTS, scopeCovers, DAILY_PRODUCTS } from '../../../shared/catalog.mjs';
+import { computeCompat } from '../../../shared/compat.mjs';
+import { computeCareer } from '../../../shared/career.mjs';
+import { PRODUCTS, scopeCovers, DAILY_PRODUCTS, MATCH_PRODUCTS, CAREER_PRODUCTS } from '../../../shared/catalog.mjs';
 
 export const localBazi = (input) => computeBazi(input);
 export const localZiwei = (input) => computeZiwei(input);
@@ -18,6 +20,78 @@ export const localDaily = (date) => {
 };
 
 export const localInterpret = (type, chart) => mockInterpret(type, chart);
+
+/* --------------------- 双人合盘 --------------------- */
+
+export function localMatch({ a, b, entitlements = [] }) {
+  const chartA = computeBazi(a);
+  const chartB = computeBazi(b);
+  const compat = computeCompat(chartA, chartB);
+  const entitled = scopeCovers(entitlements, 'match:duo');
+  const deep = scopeCovers(entitlements, 'match:deep');
+  const prices = MATCH_PRODUCTS.map((k) => ({ key: k, ...PRODUCTS[k] }));
+  if (!entitled) {
+    return {
+      entitled: false,
+      free: {
+        score: compat.score,
+        headline: compat.headline,
+        pair: compat.pair,
+        relation: compat.relation,
+        zodiac: compat.zodiac,
+        evidence: compat.evidence.slice(0, 2),
+        locked: {
+          evidence: Math.max(0, compat.evidence.length - 2),
+          conflicts: compat.conflicts.length,
+          advice: compat.advice.length,
+        },
+      },
+      prices,
+    };
+  }
+  return {
+    entitled: true,
+    deep,
+    data: deep ? compat : { ...compat, advice: compat.advice.slice(0, 1) },
+    prices,
+  };
+}
+
+/* --------------------- 学业事业 --------------------- */
+
+export function localCareer({ input, entitlements = [] }) {
+  const chart = computeBazi(input);
+  const career = computeCareer(chart);
+  const entitled = scopeCovers(entitlements, 'career:path');
+  const full = scopeCovers(entitlements, 'career:full');
+  const prices = CAREER_PRODUCTS.map((k) => ({ key: k, ...PRODUCTS[k] }));
+  if (!entitled) {
+    return {
+      entitled: false,
+      free: {
+        headline: career.headline,
+        strongest: career.strongest,
+        learningStyle: career.learning.style,
+        strengths: career.strengths.slice(0, 1),
+        counts: career.counts,
+        evidence: career.evidence.slice(0, 1),
+        locked: {
+          strengths: 2,
+          jobs: career.jobs.length,
+          stages: career.stages.length,
+          advice: career.advice.length,
+        },
+      },
+      prices,
+    };
+  }
+  return {
+    entitled: true,
+    full,
+    data: full ? career : { ...career, stages: career.stages.slice(0, 1), advice: career.advice.slice(0, 1) },
+    prices,
+  };
+}
 
 /* --------------------- 每日运势小测验 --------------------- */
 

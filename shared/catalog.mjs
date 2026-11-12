@@ -36,6 +36,70 @@ export const PRODUCTS = {
     group: 'reading',
     highlight: true,
   },
+  'bazi:full': {
+    title: '完整命盘 · 深度版',
+    titleEn: 'Complete BaZi Report',
+    price: 14.99,
+    scope: ['ch:all', 'bazi:deep'],
+    group: 'reading',
+  },
+  'bazi:annual': {
+    title: '流年专题 · 2026',
+    titleEn: 'Annual Forecast 2026',
+    price: 12.99,
+    scope: ['bazi:annual'],
+    group: 'reading',
+    ttl: 365 * 24 * 60 * 60 * 1000,
+  },
+
+  /* —— 合盘：单人画像 / 双人合盘 / 深度合盘 —— */
+  'match:profile': {
+    title: '我的情感画像',
+    titleEn: 'Love Profile',
+    price: 7.99,
+    scope: ['match:profile'],
+    group: 'match',
+  },
+  'match:duo': {
+    title: '双人合盘',
+    titleEn: 'Compatibility Report',
+    price: 14.99,
+    scope: ['match:duo'],
+    group: 'match',
+    highlight: true,
+  },
+  'match:deep': {
+    title: '深度合盘 · 沟通与冲突',
+    titleEn: 'Premium Relationship Report',
+    price: 19.99,
+    scope: ['match:duo', 'match:deep'],
+    group: 'match',
+  },
+
+  /* —— 学业事业 —— */
+  'career:path': {
+    title: '职业倾向分析',
+    titleEn: 'Career Path Reading',
+    price: 7.99,
+    scope: ['career:path'],
+    group: 'career',
+  },
+  'career:full': {
+    title: '完整学业事业报告',
+    titleEn: 'Career & Education Report',
+    price: 14.99,
+    scope: ['career:path', 'career:full'],
+    group: 'career',
+    highlight: true,
+  },
+  'career:annual': {
+    title: '年度事业专题',
+    titleEn: 'Annual Career Forecast',
+    price: 12.99,
+    scope: ['career:annual'],
+    group: 'career',
+    ttl: 365 * 24 * 60 * 60 * 1000,
+  },
 
   /* —— 每日运势小测验：订阅 —— */
   'daily:day': {
@@ -66,7 +130,7 @@ export const PRODUCTS = {
     title: '全年通 · 全部解锁',
     titleEn: 'Annual Pass · Everything',
     price: 49.99,
-    scope: ['daily', 'ch:all', 'gua'],
+    scope: ['daily', 'ch:all', 'gua', 'match:duo', 'career:full', 'bazi:annual'],
     group: 'daily',
     ttl: 365 * 24 * 60 * 60 * 1000,
     highlight: true,
@@ -84,7 +148,7 @@ export const PRODUCTS = {
   'gua:month': {
     title: '一日一卦 · 包月',
     titleEn: 'One Gua · monthly',
-    price: 19.99,
+    price: 14.99,
     scope: ['gua'],
     group: 'gua',
     ttl: 31 * 24 * 60 * 60 * 1000,
@@ -92,7 +156,7 @@ export const PRODUCTS = {
   'gua:year': {
     title: '一日一卦 · 包年',
     titleEn: 'One Gua · yearly',
-    price: 39.99,
+    price: 34.99,
     scope: ['gua'],
     group: 'gua',
     ttl: 365 * 24 * 60 * 60 * 1000,
@@ -100,9 +164,11 @@ export const PRODUCTS = {
   },
 };
 
-export const READING_PRODUCTS = ['chapter:summary', 'chapter:love', 'chapter:career', 'bundle:reading'];
+export const READING_PRODUCTS = ['chapter:summary', 'chapter:love', 'chapter:career', 'bundle:reading', 'bazi:full', 'bazi:annual'];
 export const DAILY_PRODUCTS = ['daily:day', 'daily:month', 'daily:half', 'daily:year'];
 export const GUA_PRODUCTS = ['gua:single', 'gua:month', 'gua:year'];
+export const MATCH_PRODUCTS = ['match:profile', 'match:duo', 'match:deep'];
+export const CAREER_PRODUCTS = ['career:path', 'career:full', 'career:annual'];
 
 /** 单个章节 → 对应的 scope */
 export const SECTION_SCOPE = { summary: 'ch:summary', love: 'ch:love', career: 'ch:career' };
